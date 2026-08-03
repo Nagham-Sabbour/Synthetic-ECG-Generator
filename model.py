@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class Encoder(nn.Module):
-    def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, embedding_dim=32):
+    def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, embedding_dim=32, num_classes=15):
         '''
         Encoder for the VAE model that converts data samples to latent representation.
 
@@ -14,11 +14,14 @@ class Encoder(nn.Module):
             hidden_channels3: number of channels after third conv layer
             hidden_channels4: number of channels after fourth conv layer
             embedding_dim = number of output channels
+            num_classes: number of diagnostic classes for label conditioning
         '''
         super().__init__()
+        self.num_classes = num_classes
+
         self.relu = nn.ReLU()
 
-        self.conv1 = nn.Conv1d(in_channels, hidden_channels1, stride=2, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv1d(in_channels + num_classes, hidden_channels1, stride=2, kernel_size=3, padding=1)
         self.bn1 = nn.BatchNorm1d(hidden_channels1)
 
         self.conv2 = nn.Conv1d(hidden_channels1, hidden_channels2, stride=2, kernel_size=3, padding=1)
@@ -41,7 +44,16 @@ class Encoder(nn.Module):
         self.fc_logvar = nn.Linear(flattened_size, embedding_dim)
 
 
-    def forward(self, x):
+    def forward(self, x, y):
+        '''
+        Args:
+            x: input signal, shape (batch, in_channels, 500)
+            y: one-hot class label, shape (batch, num_classes)
+        '''
+
+        y_broadcast = y.unsqueeze(-1).expand(-1, -1, x.size(-1))
+        x = torch.cat([x, y_broadcast], dim=1)
+
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -67,7 +79,7 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, embedding_dim=32, hidden_channels1=128, hidden_channels2=64, hidden_channels3=32, hidden_channels4=16, out_channels=1):
+    def __init__(self, embedding_dim=32, hidden_channels1=128, hidden_channels2=64, hidden_channels3=32, hidden_channels4=16, out_channels=1, num_classes=15):
         '''
         Decoder for the VAE model that converts latent representation to data samples.
 
@@ -78,6 +90,7 @@ class Decoder(nn.Module):
             hidden_channels3: number of channels before third conv layer
             hidden_channels4: number of channels before fourth conv layer
             out_channels: is 1 for preprocessed ECG dataset (1 lead)
+            num_classes: number of diagnostic classes for label conditioning
         '''
         super().__init__()
 
@@ -90,7 +103,7 @@ class Decoder(nn.Module):
 
         self.hidden_channels1 = hidden_channels1
 
-        self.fc = nn.Linear(in_features=embedding_dim, out_features=hidden_channels1 * self.bottleneck_length)
+        self.fc = nn.Linear(in_features=embedding_dim + num_classes, out_features=hidden_channels1 * self.bottleneck_length)
 
         self.relu = nn.ReLU()
 
@@ -110,7 +123,15 @@ class Decoder(nn.Module):
         self.conv4 = nn.Conv1d(hidden_channels4, out_channels, stride=1, kernel_size=3, padding=1)
         self.bn4 = nn.BatchNorm1d(out_channels)
 
-    def forward(self, x):
+    def forward(self, x, y):
+        '''
+        Args:
+            x: latent vector, shape (batch, embedding_dim)
+            y: one-hot class label, shape (batch, num_classes)
+        '''
+
+        x = torch.cat([x, y], dim=1)
+        
         x = self.fc(x)
         x = x.view(x.size(0), self.hidden_channels1, self.bottleneck_length)
 
@@ -136,7 +157,7 @@ class Decoder(nn.Module):
 
 
 class VAE(nn.Module):
-    def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, embedding_dim=32):
+    def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, embedding_dim=32, num_classes=15):
         '''
         Wrapper class for VAE model containing encoder and decoder.
 
@@ -147,12 +168,13 @@ class VAE(nn.Module):
             hidden_channels3: number of channels after third conv layer / before second conv layer of decoder
             hidden_channels4: number of channels after fourth conv layer / before first conv layer of decoder
             embedding_dim = number of output channels for encoder / input channels for decoder
+            num_classes: number of diagnostic classes for label conditioning
         '''
         super().__init__()
 
-        self.encoder = Encoder(in_channels=in_channels, hidden_channels1=hidden_channels1, hidden_channels2=hidden_channels2, hidden_channels3=hidden_channels3, hidden_channels4=hidden_channels4, embedding_dim=embedding_dim)
+        self.encoder = Encoder(in_channels=in_channels, hidden_channels1=hidden_channels1, hidden_channels2=hidden_channels2, hidden_channels3=hidden_channels3, hidden_channels4=hidden_channels4, embedding_dim=embedding_dim, num_classes=num_classes)
 
-        self.decoder = Decoder(embedding_dim=embedding_dim, hidden_channels1=hidden_channels4, hidden_channels2=hidden_channels3, hidden_channels3=hidden_channels2, hidden_channels4=hidden_channels1, out_channels=in_channels)
+        self.decoder = Decoder(embedding_dim=embedding_dim, hidden_channels1=hidden_channels4, hidden_channels2=hidden_channels3, hidden_channels3=hidden_channels2, hidden_channels4=hidden_channels1, out_channels=in_channels, num_classes=num_classes)
 
 
     def reparameterize(self, mean, logvar): 
@@ -169,10 +191,16 @@ class VAE(nn.Module):
         return mean + eps * std
 
 
-    def forward(self, x):
-        mean, logvar = self.encoder(x)
+    def forward(self, x, y):
+        '''
+        Args:
+            x: input signal, shape (batch, in_channels, 500)
+            y: one-hot class label, shape (batch, num_classes)
+        '''
+
+        mean, logvar = self.encoder(x, y)
         reparam = self.reparameterize(mean, logvar)
-        out = self.decoder(reparam)
+        out = self.decoder(reparam, y)
 
         return mean, logvar, out
 

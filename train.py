@@ -44,10 +44,11 @@ def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu'):
         kl_loss_total = 0
 
         # train loop
-        for signals, _ in train_loader:
+        for signals, labels in train_loader:
             signals = signals.to(device)
+            labels = labels.to(device)
 
-            mean, logvar, recon_out = vae(signals) 
+            mean, logvar, recon_out = vae(signals, labels) 
 
             # Compute reconstruction loss
             recon_loss = F.mse_loss(recon_out, signals, reduction='sum')
@@ -87,11 +88,13 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--embedding-dim", type=int, default=32)
     parser.add_argument("--loss-beta", type=float, default=1.0)
+    parser.add_argument("--num-classes", type=int, default=15)
 
     args = parser.parse_args()
 
     # set the arguments
     embedding_dim = args.embedding_dim
+    num_classes = args.num_classes
     lr = args.lr
     num_epochs = args.epochs
     batch_size = args.batch_size
@@ -104,7 +107,7 @@ def main() -> None:
     #train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
     # instantiate model
-    vae = VAE(embedding_dim=embedding_dim)
+    vae = VAE(embedding_dim=embedding_dim, num_classes=num_classes)
     params = list(vae.parameters())
     optimizer = torch.optim.Adam(params, lr=lr)
 
