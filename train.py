@@ -15,6 +15,7 @@ import os
 import datetime
 
 from model import VAE
+from visualize import generate_and_plot_samples, reconstruct_and_plot_samples
 
 DATA_ROOT = os.path.expanduser(
     "./data/ptb-xl-preprocessed-train"
@@ -124,6 +125,7 @@ def main() -> None:
     parser.add_argument("--loss-beta", type=float, default=1.0)
     parser.add_argument("--num-classes", type=int, default=15)
     parser.add_argument("--checkpoint-dir", type=str, default='checkpoints')
+    parser.add_argument("--visuals-dir", type=str, default='visuals')
 
     args = parser.parse_args()
 
@@ -136,6 +138,7 @@ def main() -> None:
     beta = args.loss_beta
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     checkpoint_dir = args.checkpoint_dir
+    visuals_dir = args.visuals_dir
 
     # load the preprocessed dataset - TODO
     #train_dataset = 
@@ -149,6 +152,15 @@ def main() -> None:
 
     #train_VAE(vae, num_epochs, train_loader, optimizer, beta=beta, device=device, checkpoint_dir=checkpoint_dir)
 
+    # TODO - load mean/std and class names from preprocessing
+    #mean = 
+    #std = 
+    #class_names = 
+
+    # visualize results from the trained model
+    #generate_and_plot_samples(vae, mean, std, num_classes=num_classes, samples_per_class=1, output_dir=visuals_dir, filename_prefix='vae_generated', class_names=class_names, embedding_dim=embedding_dim, device=device)
+    #signals, labels = next(iter(train_loader))
+    #reconstruct_and_plot_samples(vae, signals, labels, mean, std, num_samples=6, output_dir=visuals_dir, filename_prefix='vae_reconstructed', class_names=class_names, device=device)
 
 
 if __name__ == "__main__":
