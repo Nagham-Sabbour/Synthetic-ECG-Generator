@@ -204,4 +204,68 @@ class VAE(nn.Module):
 
         return mean, logvar, out
 
-    
+
+
+class Discriminator(nn.Module):
+    def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, num_classes=15):
+        '''
+        Discriminator for the GAN that tries to classify real vs fake samples.
+
+        Args:
+            in_channels: is 1 for preprocessed ECG dataset (1 lead)
+            hidden_channels1: number of channels after first conv layer
+            hidden_channels2: number of channels after second conv layer
+            hidden_channels3: number of channels after third conv layer
+            hidden_channels4: number of channels after fourth conv layer
+            num_classes: number of diagnostic classes for label conditioning
+        '''
+        super().__init__()
+        self.num_classes = num_classes
+
+        self.relu = nn.ReLU()
+        
+        self.conv1 = nn.Conv1d(in_channels + num_classes, hidden_channels1, stride=2, kernel_size=3, padding=1)
+
+        self.conv2 = nn.Conv1d(hidden_channels1, hidden_channels2, stride=2, kernel_size=3, padding=1)
+
+        self.conv3 = nn.Conv1d(hidden_channels2, hidden_channels3, stride=2, kernel_size=3, padding=1)
+
+        self.conv4 = nn.Conv1d(hidden_channels3, hidden_channels4, stride=2, kernel_size=3, padding=1)
+
+        self.flatten = nn.Flatten()
+
+        # For input_length=500, kernel=3, stride=2, padding=1, 4 conv layers:
+        # Layer lengths: 500 -> 250 -> 125 -> 63 -> 32
+        # **Note: Recompute if architecture is changed
+        flattened_size = hidden_channels4 * 32
+
+        self.fc = nn.Linear(flattened_size, 1)
+
+
+    def forward(self, x, y):
+        '''
+        Args:
+            x: input signal, shape (batch, in_channels, 500)
+            y: one-hot class label, shape (batch, num_classes)
+        '''
+
+        y_broadcast = y.unsqueeze(-1).expand(-1, -1, x.size(-1))
+        x = torch.cat([x, y_broadcast], dim=1)
+
+        x = self.conv1(x)
+        x = self.relu(x)
+
+        x = self.conv2(x)
+        x = self.relu(x)
+
+        x = self.conv3(x)
+        x = self.relu(x)
+
+        x = self.conv4(x)
+        x = self.relu(x)
+
+        x = self.flatten(x)
+
+        x = self.fc(x)
+
+        return x

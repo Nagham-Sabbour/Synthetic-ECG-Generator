@@ -12,6 +12,7 @@ import random
 import math
 import argparse
 import os
+import datetime
 
 from model import VAE
 
@@ -19,7 +20,7 @@ DATA_ROOT = os.path.expanduser(
     "./data/ptb-xl-preprocessed-train"
 )
 
-def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu'):
+def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu', checkpoint_dir='checkpoints'):
     '''
     Train the provided VAE model.
 
@@ -29,9 +30,17 @@ def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu'):
         train_loader: contains the training data
         optimizer: optimizer to use for training
         beta: weight factor for KL divergence loss term
+        device: 'cpu' or 'cuda'
+        checkpoint_dir: directory name of where to save the model checkpoints
     '''
 
     vae.to(device)
+
+    # for checkpoint saving
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    run_timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    best_loss = float('inf')
+    best_checkpoint_path = None
 
     for epoch in range(num_epochs):
 
@@ -79,9 +88,34 @@ def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu'):
             f"Reconstruction Loss: {avg_recon_loss:.3f}  "
             f"KL Divergence Loss: {avg_kl_loss:.3f}")
 
+        # save best checkpoint by avg train loss
+        if avg_loss < best_loss:
+            best_loss = avg_loss
+            best_checkpoint_path = os.path.join(checkpoint_dir, f"vae_best_{run_timestamp}.pt")
+            torch.save({
+                'model_state_dict': vae.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'epoch': epoch + 1,
+                'loss': avg_loss,
+            }, best_checkpoint_path)
+
+    # save final checkpoint regardless of loss
+    final_checkpoint_path = os.path.join(checkpoint_dir, f"vae_final_epoch{num_epochs}_{run_timestamp}.pt")
+    torch.save({
+        'model_state_dict': vae.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'epoch': epoch + 1,
+        'loss': avg_loss,
+    }, final_checkpoint_path)
+
+    print(f"Saved best checkpoint (loss={best_loss:.3f}) to {best_checkpoint_path}")
+    print(f"Saved final checkpoint to {final_checkpoint_path}")
+
+    return best_checkpoint_path, final_checkpoint_path
+
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Train Synthetic ECG Generator")
+    parser = argparse.ArgumentParser(description="Train Synthetic ECG Generator (VAE)")
     parser.add_argument("--data-root", type=str, default=DATA_ROOT)
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--epochs", type=int, default=20)
@@ -89,6 +123,7 @@ def main() -> None:
     parser.add_argument("--embedding-dim", type=int, default=32)
     parser.add_argument("--loss-beta", type=float, default=1.0)
     parser.add_argument("--num-classes", type=int, default=15)
+    parser.add_argument("--checkpoint-dir", type=str, default='checkpoints')
 
     args = parser.parse_args()
 
@@ -100,6 +135,7 @@ def main() -> None:
     batch_size = args.batch_size
     beta = args.loss_beta
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    checkpoint_dir = args.checkpoint_dir
 
     # load the preprocessed dataset - TODO
     #train_dataset = 
@@ -111,7 +147,7 @@ def main() -> None:
     params = list(vae.parameters())
     optimizer = torch.optim.Adam(params, lr=lr)
 
-    #train_VAE(vae, num_epochs, train_loader, optimizer, beta=beta, device=device)
+    #train_VAE(vae, num_epochs, train_loader, optimizer, beta=beta, device=device, checkpoint_dir=checkpoint_dir)
 
 
 
