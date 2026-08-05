@@ -15,13 +15,13 @@ import os
 import datetime
 
 from model import VAE
-from visualize import generate_and_plot_samples, reconstruct_and_plot_samples
+from visualize import generate_and_plot_samples, reconstruct_and_plot_samples, plot_training_losses
 
 DATA_ROOT = os.path.expanduser(
     "./processed_data"
 )
 
-def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu', checkpoint_dir='checkpoints'):
+def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu', checkpoint_dir='checkpoints', plots_dir='training_plots'):
     '''
     Train the provided VAE model.
 
@@ -33,6 +33,7 @@ def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu', 
         beta: weight factor for KL divergence loss term
         device: 'cpu' or 'cuda'
         checkpoint_dir: directory name of where to save the model checkpoints
+        plots_dir: directory name of where to save the training curve plots
     '''
 
     vae.to(device)
@@ -42,6 +43,11 @@ def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu', 
     run_timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
     best_loss = float('inf')
     best_checkpoint_path = None
+
+    # for training plots: track per-epoch loss averages across whole run 
+    total_loss_history = []
+    recon_loss_history = []
+    kl_loss_history = []
 
     for epoch in range(num_epochs):
 
@@ -84,6 +90,11 @@ def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu', 
         avg_recon_loss = recon_loss_total / num_batches
         avg_kl_loss = kl_loss_total / num_batches
 
+        # append losses to history
+        total_loss_history.append(avg_loss)
+        recon_loss_history.append(avg_recon_loss)
+        kl_loss_history.append(avg_kl_loss)
+
         print(f"Epoch [{epoch+1}/{num_epochs}]  "
             f"Total Loss: {avg_loss:.3f}  "
             f"Reconstruction Loss: {avg_recon_loss:.3f}  "
@@ -111,6 +122,13 @@ def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu', 
 
     print(f"Saved best checkpoint (loss={best_loss:.3f}) to {best_checkpoint_path}")
     print(f"Saved final checkpoint to {final_checkpoint_path}")
+
+    # plot loss curves
+    plot_training_losses({
+        'Total Loss': total_loss_history,
+        'Reconstruction Loss': recon_loss_history,
+        'KL Divergence Loss': kl_loss_history,
+    }, output_dir=plots_dir, filename_prefix='vae_training_loss')
 
     return best_checkpoint_path, final_checkpoint_path
 
@@ -169,9 +187,10 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--embedding-dim", type=int, default=32)
     parser.add_argument("--loss-beta", type=float, default=1.0)
-    parser.add_argument("--num-classes", type=int, default=15)
+    parser.add_argument("--num-classes", type=int, default=11)
     parser.add_argument("--checkpoint-dir", type=str, default='checkpoints')
     parser.add_argument("--visuals-dir", type=str, default='visuals')
+    parser.add_argument("--plots-dir", type=str, default='training_plots')
 
     args = parser.parse_args()
 
@@ -185,6 +204,7 @@ def main() -> None:
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     checkpoint_dir = args.checkpoint_dir
     visuals_dir = args.visuals_dir
+    plots_dir = args.plots_dir
 
     # Load the training data
     train_data = np.load(os.path.join(args.data_root, "train.npz"))
@@ -215,7 +235,7 @@ def main() -> None:
     params = list(vae.parameters())
     optimizer = torch.optim.Adam(params, lr=lr)
 
-    train_VAE(vae, num_epochs, train_loader, optimizer, beta=beta, device=device, checkpoint_dir=checkpoint_dir)
+    train_VAE(vae, num_epochs, train_loader, optimizer, beta=beta, device=device, checkpoint_dir=checkpoint_dir, plots_dir=plots_dir)
 
     # TODO - load mean/std and class names from preprocessing
     #mean = 

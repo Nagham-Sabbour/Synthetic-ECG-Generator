@@ -3,7 +3,7 @@ import torch
 import matplotlib.pyplot as plt
 import datetime
 
-def generate_and_plot_samples(vae, mean, std, num_classes=15, samples_per_class=1, output_dir='visuals', filename_prefix='generated_samples', class_names=None, embedding_dim=32, device='cpu'):
+def generate_and_plot_samples(vae, mean, std, num_classes=11, samples_per_class=1, output_dir='visuals', filename_prefix='generated_samples', class_names=None, embedding_dim=32, device='cpu'):
     '''
     Generate synthetic ECG samples for each class and save the plots.
 
@@ -128,4 +128,43 @@ def reconstruct_and_plot_samples(vae, signals, labels, mean, std, num_samples=6,
 
     print(f"Saved reconstruction plot to {save_path}")
 
+    return save_path
+
+
+def plot_training_losses(losses_dict, output_dir='training_plots', filename_prefix='training_loss'):
+    '''
+    Plot training loss curves over epochs and save to folder.
+
+    Args: 
+        losses_dict: dict mapping loss name to list of per-epoch average values
+                     eg. {'Total Loss': [...], 'Reconstruction Loss': [...], 'KL Divergence Loss': [...]}
+        output_dir: folder name to save the plot to
+        filename_prefix: prefix for the saved plot filename, timestamp will be appended
+
+    Returns: 
+        save_path: path to the saved plot
+    '''
+
+    num_losses = len(losses_dict)
+    fig, axes = plt.subplots(num_losses, 1, figsize=(8, 3*num_losses), sharex=True, squeeze=False)
+
+    for i, (loss_name, values) in enumerate(losses_dict.items()):
+        ax = axes[i, 0]
+        epochs = range(1, len(values)+1)
+        ax.plot(epochs, values)
+        ax.set_ylabel(loss_name, fontsize=9)
+        ax.grid(True, alpha=0.3)
+
+    axes[-1, 0].set_xlabel('Epoch')
+    plt.tight_layout()
+
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"{filename_prefix}_{timestamp}.png"
+    save_path = os.path.join(output_dir, filename)
+    fig.savefig(save_path)
+    plt.close(fig)
+
+    print(f"Saved training loss plot to {save_path}")
+    
     return save_path

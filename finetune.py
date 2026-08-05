@@ -16,14 +16,14 @@ import datetime
 
 from model import VAE, Discriminator
 from utils import load_vae_checkpoint
-from visualize import generate_and_plot_samples, reconstruct_and_plot_samples
+from visualize import generate_and_plot_samples, reconstruct_and_plot_samples, plot_training_losses
 
 DATA_ROOT = os.path.expanduser(
     "./data/ptb-xl-preprocessed-train"
 )
 
 
-def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer, discrim_optimizer, beta=1.0, lambda_adv=1.0, device='cpu', checkpoint_dir='checkpoints'):
+def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer, discrim_optimizer, beta=1.0, lambda_adv=1.0, device='cpu', checkpoint_dir='checkpoints', plots_dir='training_plots'):
     '''
     Fine-tune a pretrained VAE's decoder using a GAN-based discriminator.
 
@@ -38,6 +38,7 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
         lambda_adv: weight factor for adversarial loss term
         device: 'cpu' or 'cuda'
         checkpoint_dir: directory name of where to save the model checkpoints
+        plots_dir: directory name of where to save the training curve plots
     '''
 
     vae.to(device)
@@ -52,6 +53,13 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
     run_timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
     best_recon_loss = float('inf')
     best_checkpoint_path = None
+
+    # for training plots: track per-epoch loss averages across whole run 
+    total_generator_loss_history = []
+    recon_loss_history = []
+    kl_loss_history = []
+    generator_adversarial_loss_history = []
+    discrim_loss_history = []
     
     for epoch in range(num_epochs):
 
@@ -131,6 +139,13 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
         avg_generator_adversarial_loss = generator_adversarial_loss_total / num_batches
         avg_discrim_loss = discrim_loss_total / num_batches
 
+        # append losses to history
+        total_generator_loss_history.append(avg_generator_loss)
+        recon_loss_history.append(avg_recon_loss)
+        kl_loss_history.append(avg_kl_loss)
+        generator_adversarial_loss_history.append(avg_generator_adversarial_loss)
+        discrim_loss_history.append(avg_discrim_loss)
+
         print(f"Epoch [{epoch+1}/{num_epochs}]  "
             f"Generator Loss: {avg_generator_loss:.3f}  "
             f"Reconstruction Loss: {avg_recon_loss:.3f}  "
@@ -169,6 +184,15 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
     print(f"Saved best checkpoint (recon_loss={best_recon_loss:.3f}) to {best_checkpoint_path}")
     print(f"Saved final checkpoint to {final_checkpoint_path}")
 
+    # plot loss curves
+    plot_training_losses({
+        'Total Generator Loss': total_generator_loss_history,
+        'Reconstruction Loss': recon_loss_history,
+        'KL Divergence Loss': kl_loss_history,
+        'Generator Adversarial Loss': generator_adversarial_loss_history,
+        'Discriminator Loss': discrim_loss_history,
+    }, output_dir=plots_dir, filename_prefix='vaegan_finetuning_loss')
+
     return best_checkpoint_path, final_checkpoint_path
 
 
@@ -183,9 +207,10 @@ def main() -> None:
     parser.add_argument("--embedding-dim", type=int, default=32) #Note: must match the original vae training run
     parser.add_argument("--loss-beta", type=float, default=1.0)
     parser.add_argument("--loss-lambda-adv", type=float, default=1.0)
-    parser.add_argument("--num-classes", type=int, default=15) #Note: must match the original vae training run
+    parser.add_argument("--num-classes", type=int, default=11) #Note: must match the original vae training run
     parser.add_argument("--checkpoint-dir", type=str, default='checkpoints')
     parser.add_argument("--visuals-dir", type=str, default='visuals')
+    parser.add_argument("--plots-dir", type=str, default='training_plots')
 
     args = parser.parse_args()
     
@@ -202,6 +227,7 @@ def main() -> None:
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     checkpoint_dir = args.checkpoint_dir
     visuals_dir = args.visuals_dir
+    plots_dir = args.plots_dir
 
     # load the preprocessed dataset - TODO
     #train_dataset = 
@@ -225,7 +251,7 @@ def main() -> None:
     vae_optimizer = torch.optim.Adam(vae_params, lr=decoder_lr)
 
 
-    #finetune_VAE_GAN(vae, discrim, num_epochs, train_loader, vae_optimizer, discrim_optimizer, beta, lambda_adv, device, checkpoint_dir=checkpoint_dir)
+    #finetune_VAE_GAN(vae, discrim, num_epochs, train_loader, vae_optimizer, discrim_optimizer, beta, lambda_adv, device, checkpoint_dir=checkpoint_dir, plots_dir=plots_dir)
 
     # TODO - load mean/std and class names from preprocessing
     #mean = 
