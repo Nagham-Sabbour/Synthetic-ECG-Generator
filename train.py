@@ -169,7 +169,7 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--embedding-dim", type=int, default=32)
     parser.add_argument("--loss-beta", type=float, default=1.0)
-    parser.add_argument("--num-classes", type=int, default=15)
+    parser.add_argument("--num-classes", type=int, default=11)
     parser.add_argument("--checkpoint-dir", type=str, default='checkpoints')
     parser.add_argument("--visuals-dir", type=str, default='visuals')
 

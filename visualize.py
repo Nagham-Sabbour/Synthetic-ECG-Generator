@@ -3,7 +3,7 @@ import torch
 import matplotlib.pyplot as plt
 import datetime
 
-def generate_and_plot_samples(vae, mean, std, num_classes=15, samples_per_class=1, output_dir='visuals', filename_prefix='generated_samples', class_names=None, embedding_dim=32, device='cpu'):
+def generate_and_plot_samples(vae, mean, std, num_classes=11, samples_per_class=1, output_dir='visuals', filename_prefix='generated_samples', class_names=None, embedding_dim=32, device='cpu'):
     '''
     Generate synthetic ECG samples for each class and save the plots.
 

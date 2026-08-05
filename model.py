@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class Encoder(nn.Module):
-    def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, embedding_dim=32, num_classes=15):
+    def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, embedding_dim=32, num_classes=11):
         '''
         Encoder for the VAE model that converts data samples to latent representation.
 
@@ -79,7 +79,7 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, embedding_dim=32, hidden_channels1=128, hidden_channels2=64, hidden_channels3=32, hidden_channels4=16, out_channels=1, num_classes=15):
+    def __init__(self, embedding_dim=32, hidden_channels1=128, hidden_channels2=64, hidden_channels3=32, hidden_channels4=16, out_channels=1, num_classes=11):
         '''
         Decoder for the VAE model that converts latent representation to data samples.
 
@@ -157,7 +157,7 @@ class Decoder(nn.Module):
 
 
 class VAE(nn.Module):
-    def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, embedding_dim=32, num_classes=15):
+    def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, embedding_dim=32, num_classes=11):
         '''
         Wrapper class for VAE model containing encoder and decoder.
 
@@ -207,7 +207,7 @@ class VAE(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, num_classes=15):
+    def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, num_classes=11):
         '''
         Discriminator for the GAN that tries to classify real vs fake samples.
 
