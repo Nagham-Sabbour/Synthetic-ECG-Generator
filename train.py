@@ -1,25 +1,15 @@
 import torch
-from torch.utils.data import TensorDataset, DataLoader, Subset, random_split, Sampler
-import torch.nn as nn
 import torch.nn.functional as F
 
-import matplotlib.pyplot as plt
-from tqdm import tqdm
-
-
-import numpy as np
-import random
-import math
 import argparse
 import os
 import datetime
 
 from model import VAE
+from utils import create_balanced_train_loader, load_preprocessing_metadata
 from visualize import generate_and_plot_samples, reconstruct_and_plot_samples, plot_training_losses
 
-DATA_ROOT = os.path.expanduser(
-    "./processed_data"
-)
+DATA_ROOT = "./processed_data"
 
 def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu', checkpoint_dir='checkpoints', plots_dir='training_plots'):
     '''
@@ -132,53 +122,6 @@ def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu', 
 
     return best_checkpoint_path, final_checkpoint_path
 
-class BalancedBatchSampler(Sampler):
-    def __init__(self, labels, batch_size, seed=42):
-        self.labels = labels
-        self.class_ids = torch.unique(labels).tolist()
-        self.num_classes = len(self.class_ids)
-
-        assert batch_size % self.num_classes == 0, (
-            f"batch_size must be divisible by {self.num_classes} classes"
-        )
-
-        self.samples_per_class = batch_size // self.num_classes
-        self.num_batches = len(labels) // batch_size
-        self.seed = seed
-
-        self.class_indices = {
-            class_id: torch.where(labels == class_id)[0].tolist()
-            for class_id in self.class_ids
-        }
-
-    def __iter__(self):
-        rng = random.Random(self.seed)
-
-        # Make a shuffled pool of indices for every class
-        pools = {}
-        for class_id, indices in self.class_indices.items():
-            pools[class_id] = indices.copy()
-            rng.shuffle(pools[class_id])
-
-        for _ in range(self.num_batches):
-            batch = []
-
-            for class_id in self.class_ids:
-                # Refill and reshuffle a class pool when it runs out
-                while len(pools[class_id]) < self.samples_per_class:
-                    extra_indices = self.class_indices[class_id].copy()
-                    rng.shuffle(extra_indices)
-                    pools[class_id].extend(extra_indices)
-
-                batch.extend(pools[class_id][:self.samples_per_class])
-                pools[class_id] = pools[class_id][self.samples_per_class:]
-
-            rng.shuffle(batch)
-            yield batch
-
-    def __len__(self):
-        return self.num_batches
-
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train Synthetic ECG Generator (VAE)")
     parser.add_argument("--data-root", type=str, default=DATA_ROOT)
@@ -199,36 +142,31 @@ def main() -> None:
     num_classes = args.num_classes
     lr = args.lr
     num_epochs = args.epochs
-    batch_size = math.ceil(args.batch_size / 11) * 11
+    batch_size = args.batch_size
     beta = args.loss_beta
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     checkpoint_dir = args.checkpoint_dir
     visuals_dir = args.visuals_dir
     plots_dir = args.plots_dir
 
-    # Load the training data
-    train_data = np.load(os.path.join(args.data_root, "train.npz"))
+    # load the training data
+    preprocessing_info = load_preprocessing_metadata(args.data_root)
 
-    signals = torch.from_numpy(train_data["signals"]).float()
-    labels = torch.from_numpy(train_data["labels"]).long()
+    mean = preprocessing_info["signal_mean"]
+    std = preprocessing_info["signal_std"]
+    class_names = preprocessing_info["class_names"]
+    num_classes = preprocessing_info["num_classes"]
 
-    # Change the shape for Conv1d input
-    signals = signals.unsqueeze(1)
-    
-    # Confirm the right shape
-    assert signals.ndim == 3
-    assert signals.shape[1] == 1
-    assert len(signals) == len(labels)
+    assert num_classes == args.num_classes, (
+        f"Expected {args.num_classes} classes, but preprocessing produced "
+        f"{num_classes} classes."
+    )
 
-    train_dataset = TensorDataset(signals, labels)
-
-    balanced_batch_sampler = BalancedBatchSampler(
-        labels=labels,
+    train_loader = create_balanced_train_loader(
+        data_root=args.data_root,
         batch_size=batch_size,
         seed=42,
     )
-
-    train_loader = DataLoader(train_dataset, batch_sampler=balanced_batch_sampler )
 
     # instantiate model
     vae = VAE(embedding_dim=embedding_dim, num_classes=num_classes)
@@ -243,9 +181,9 @@ def main() -> None:
     #class_names = 
 
     # visualize results from the trained model
-    #generate_and_plot_samples(vae, mean, std, num_classes=num_classes, samples_per_class=1, output_dir=visuals_dir, filename_prefix='vae_generated', class_names=class_names, embedding_dim=embedding_dim, device=device)
-    #signals, labels = next(iter(train_loader))
-    #reconstruct_and_plot_samples(vae, signals, labels, mean, std, num_samples=6, output_dir=visuals_dir, filename_prefix='vae_reconstructed', class_names=class_names, device=device)
+    generate_and_plot_samples(vae, mean, std, num_classes=num_classes, samples_per_class=1, output_dir=visuals_dir, filename_prefix='vae_generated', class_names=class_names, embedding_dim=embedding_dim, device=device)
+    signals, labels = next(iter(train_loader))
+    reconstruct_and_plot_samples(vae, signals, labels, mean, std, num_samples=6, output_dir=visuals_dir, filename_prefix='vae_reconstructed', class_names=class_names, device=device)
 
 
 if __name__ == "__main__":
