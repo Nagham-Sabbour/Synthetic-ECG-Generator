@@ -1,9 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torch.utils.data import Sampler
 
-import random
-import math
 import argparse
 import os
 import datetime
@@ -125,53 +122,6 @@ def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu', 
 
     return best_checkpoint_path, final_checkpoint_path
 
-class BalancedBatchSampler(Sampler):
-    def __init__(self, labels, batch_size, seed=42):
-        self.labels = labels
-        self.class_ids = torch.unique(labels).tolist()
-        self.num_classes = len(self.class_ids)
-
-        assert batch_size % self.num_classes == 0, (
-            f"batch_size must be divisible by {self.num_classes} classes"
-        )
-
-        self.samples_per_class = batch_size // self.num_classes
-        self.num_batches = len(labels) // batch_size
-        self.seed = seed
-
-        self.class_indices = {
-            class_id: torch.where(labels == class_id)[0].tolist()
-            for class_id in self.class_ids
-        }
-
-    def __iter__(self):
-        rng = random.Random(self.seed)
-
-        # Make a shuffled pool of indices for every class
-        pools = {}
-        for class_id, indices in self.class_indices.items():
-            pools[class_id] = indices.copy()
-            rng.shuffle(pools[class_id])
-
-        for _ in range(self.num_batches):
-            batch = []
-
-            for class_id in self.class_ids:
-                # Refill and reshuffle a class pool when it runs out
-                while len(pools[class_id]) < self.samples_per_class:
-                    extra_indices = self.class_indices[class_id].copy()
-                    rng.shuffle(extra_indices)
-                    pools[class_id].extend(extra_indices)
-
-                batch.extend(pools[class_id][:self.samples_per_class])
-                pools[class_id] = pools[class_id][self.samples_per_class:]
-
-            rng.shuffle(batch)
-            yield batch
-
-    def __len__(self):
-        return self.num_batches
-
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train Synthetic ECG Generator (VAE)")
     parser.add_argument("--data-root", type=str, default=DATA_ROOT)
@@ -192,7 +142,7 @@ def main() -> None:
     num_classes = args.num_classes
     lr = args.lr
     num_epochs = args.epochs
-    batch_size = math.ceil(args.batch_size / 11) * 11
+    batch_size = args.batch_size
     beta = args.loss_beta
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     checkpoint_dir = args.checkpoint_dir

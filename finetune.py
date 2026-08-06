@@ -54,6 +54,7 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
 
         # put to train mode
         vae.train()
+        vae.encoder.eval()
         discriminator.train()
 
         # initiate variables
@@ -107,7 +108,7 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
             generator_adversarial_loss = F.binary_cross_entropy_with_logits(fake_logits_for_gen, torch.ones_like(fake_logits_for_gen))
 
             # Overall generator loss (VAE loss + adversarial loss)
-            generator_loss = recon_loss + (beta * kl_loss) + (lambda_adv * generator_adversarial_loss)
+            generator_loss = recon_loss + (lambda_adv * generator_adversarial_loss)
 
             # Backpropagate and optimize
             vae_optimizer.zero_grad()
@@ -187,7 +188,7 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fine-tune Synthetic ECG Generator (VAE + GAN)")
-    parser.add_argument("--trained-vae-filename", type=str)
+    parser.add_argument("--trained-vae-filename", type=str, required=True)
     parser.add_argument("--data-root", type=str, default=DATA_ROOT)
     parser.add_argument("--batch-size", type=int, default=66)
     parser.add_argument("--epochs", type=int, default=20)
