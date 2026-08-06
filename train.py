@@ -1,13 +1,7 @@
 import torch
-from torch.utils.data import TensorDataset, DataLoader, Subset, random_split, Sampler
-import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.data import Sampler
 
-import matplotlib.pyplot as plt
-from tqdm import tqdm
-
-
-import numpy as np
 import random
 import math
 import argparse
@@ -15,11 +9,10 @@ import os
 import datetime
 
 from model import VAE
+from utils import create_balanced_train_loader, load_preprocessing_metadata
 from visualize import generate_and_plot_samples, reconstruct_and_plot_samples, plot_training_losses
 
-DATA_ROOT = os.path.expanduser(
-    "./processed_data"
-)
+DATA_ROOT = "./processed_data"
 
 def train_VAE(vae, num_epochs, train_loader, optimizer, beta=1.0, device='cpu', checkpoint_dir='checkpoints', plots_dir='training_plots'):
     '''
@@ -206,29 +199,24 @@ def main() -> None:
     visuals_dir = args.visuals_dir
     plots_dir = args.plots_dir
 
-    # Load the training data
-    train_data = np.load(os.path.join(args.data_root, "train.npz"))
+    # load the training data
+    preprocessing_info = load_preprocessing_metadata(args.data_root)
 
-    signals = torch.from_numpy(train_data["signals"]).float()
-    labels = torch.from_numpy(train_data["labels"]).long()
+    mean = preprocessing_info["signal_mean"]
+    std = preprocessing_info["signal_std"]
+    class_names = preprocessing_info["class_names"]
+    num_classes = preprocessing_info["num_classes"]
 
-    # Change the shape for Conv1d input
-    signals = signals.unsqueeze(1)
-    
-    # Confirm the right shape
-    assert signals.ndim == 3
-    assert signals.shape[1] == 1
-    assert len(signals) == len(labels)
+    assert num_classes == args.num_classes, (
+        f"Expected {args.num_classes} classes, but preprocessing produced "
+        f"{num_classes} classes."
+    )
 
-    train_dataset = TensorDataset(signals, labels)
-
-    balanced_batch_sampler = BalancedBatchSampler(
-        labels=labels,
+    train_loader = create_balanced_train_loader(
+        data_root=args.data_root,
         batch_size=batch_size,
         seed=42,
     )
-
-    train_loader = DataLoader(train_dataset, batch_sampler=balanced_batch_sampler )
 
     # instantiate model
     vae = VAE(embedding_dim=embedding_dim, num_classes=num_classes)
@@ -243,9 +231,9 @@ def main() -> None:
     #class_names = 
 
     # visualize results from the trained model
-    #generate_and_plot_samples(vae, mean, std, num_classes=num_classes, samples_per_class=1, output_dir=visuals_dir, filename_prefix='vae_generated', class_names=class_names, embedding_dim=embedding_dim, device=device)
-    #signals, labels = next(iter(train_loader))
-    #reconstruct_and_plot_samples(vae, signals, labels, mean, std, num_samples=6, output_dir=visuals_dir, filename_prefix='vae_reconstructed', class_names=class_names, device=device)
+    generate_and_plot_samples(vae, mean, std, num_classes=num_classes, samples_per_class=1, output_dir=visuals_dir, filename_prefix='vae_generated', class_names=class_names, embedding_dim=embedding_dim, device=device)
+    signals, labels = next(iter(train_loader))
+    reconstruct_and_plot_samples(vae, signals, labels, mean, std, num_samples=6, output_dir=visuals_dir, filename_prefix='vae_reconstructed', class_names=class_names, device=device)
 
 
 if __name__ == "__main__":

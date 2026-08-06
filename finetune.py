@@ -1,26 +1,15 @@
 import torch
-from torch.utils.data import TensorDataset, DataLoader, Subset, random_split
-import torch.nn as nn
 import torch.nn.functional as F
 
-import matplotlib.pyplot as plt
-from tqdm import tqdm
-
-
-import numpy as np
-import random
-import math
 import argparse
 import os
 import datetime
 
-from model import VAE, Discriminator
-from utils import load_vae_checkpoint
+from model import Discriminator
+from utils import load_vae_checkpoint, create_balanced_train_loader, load_preprocessing_metadata
 from visualize import generate_and_plot_samples, reconstruct_and_plot_samples, plot_training_losses
 
-DATA_ROOT = os.path.expanduser(
-    "./data/ptb-xl-preprocessed-train"
-)
+DATA_ROOT = "./processed_data"
 
 
 def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer, discrim_optimizer, beta=1.0, lambda_adv=1.0, device='cpu', checkpoint_dir='checkpoints', plots_dir='training_plots'):
@@ -200,7 +189,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Fine-tune Synthetic ECG Generator (VAE + GAN)")
     parser.add_argument("--trained-vae-filename", type=str)
     parser.add_argument("--data-root", type=str, default=DATA_ROOT)
-    parser.add_argument("--batch-size", type=int, default=64)
+    parser.add_argument("--batch-size", type=int, default=66)
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--decoder-lr", type=float, default=1e-3)
     parser.add_argument("--discrim-lr", type=float, default=1e-3)
@@ -229,10 +218,24 @@ def main() -> None:
     visuals_dir = args.visuals_dir
     plots_dir = args.plots_dir
 
-    # load the preprocessed dataset - TODO
-    #train_dataset = 
-    # and build a train loader
-    #train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    # load the preprocessed dataset
+    preprocessing_info = load_preprocessing_metadata(args.data_root)
+
+    mean = preprocessing_info["signal_mean"]
+    std = preprocessing_info["signal_std"]
+    class_names = preprocessing_info["class_names"]
+    num_classes = preprocessing_info["num_classes"]
+
+    assert num_classes == args.num_classes, (
+        f"Expected {args.num_classes} classes, but preprocessing produced "
+        f"{num_classes} classes."
+    )
+
+    train_loader = create_balanced_train_loader(
+        data_root=args.data_root,
+        batch_size=batch_size,
+        seed=42,
+    )
 
     # load the vae checkpoint
     vae, _ = load_vae_checkpoint(
@@ -251,17 +254,12 @@ def main() -> None:
     vae_optimizer = torch.optim.Adam(vae_params, lr=decoder_lr)
 
 
-    #finetune_VAE_GAN(vae, discrim, num_epochs, train_loader, vae_optimizer, discrim_optimizer, beta, lambda_adv, device, checkpoint_dir=checkpoint_dir, plots_dir=plots_dir)
-
-    # TODO - load mean/std and class names from preprocessing
-    #mean = 
-    #std = 
-    #class_names =
+    finetune_VAE_GAN(vae, discrim, num_epochs, train_loader, vae_optimizer, discrim_optimizer, beta, lambda_adv, device, checkpoint_dir=checkpoint_dir, plots_dir=plots_dir)
 
     # visualize results from the trained model
-    #generate_and_plot_samples(vae, mean, std, num_classes=num_classes, samples_per_class=1, output_dir=visuals_dir, filename_prefix='vae_gan_generated', class_names=class_names, embedding_dim=embedding_dim, device=device)
-    #signals, labels = next(iter(train_loader))
-    #reconstruct_and_plot_samples(vae, signals, labels, mean, std, num_samples=6, output_dir=visuals_dir, filename_prefix='vae_gan_reconstructed', class_names=class_names, device=device)
+    generate_and_plot_samples(vae, mean, std, num_classes=num_classes, samples_per_class=1, output_dir=visuals_dir, filename_prefix='vae_gan_generated', class_names=class_names, embedding_dim=embedding_dim, device=device)
+    signals, labels = next(iter(train_loader))
+    reconstruct_and_plot_samples(vae, signals, labels, mean, std, num_samples=6, output_dir=visuals_dir, filename_prefix='vae_gan_reconstructed', class_names=class_names, device=device)
     
 
 if __name__ == "__main__":

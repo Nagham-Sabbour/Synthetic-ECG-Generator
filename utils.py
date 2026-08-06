@@ -1,6 +1,102 @@
+import json
+import os
+import random
+
+import numpy as np
 import torch
+from torch.utils.data import DataLoader, Sampler, TensorDataset
 
 from model import VAE
+
+class BalancedBatchSampler(Sampler):
+    '''Create batches with an equal number of samples from every class.'''
+
+    def __init__(self, label_ids, batch_size, seed=42):
+        self.class_ids = torch.unique(label_ids).tolist()
+        self.num_classes = len(self.class_ids)
+
+        assert batch_size % self.num_classes == 0, (
+            f"batch_size must be divisible by {self.num_classes} classes"
+        )
+
+        self.samples_per_class = batch_size // self.num_classes
+        self.num_batches = len(label_ids) // batch_size
+        self.seed = seed
+        self.epoch = 0
+
+        self.class_indices = {
+            class_id: torch.where(label_ids == class_id)[0].tolist()
+            for class_id in self.class_ids
+        }
+
+    def __iter__(self):
+        # Different order every epoch, but reproducible across complete runs.
+        rng = random.Random(self.seed + self.epoch)
+        self.epoch += 1
+
+        pools = {}
+
+        for class_id, indices in self.class_indices.items():
+            pools[class_id] = indices.copy()
+            rng.shuffle(pools[class_id])
+
+        for _ in range(self.num_batches):
+            batch = []
+
+            for class_id in self.class_ids:
+                while len(pools[class_id]) < self.samples_per_class:
+                    extra_indices = self.class_indices[class_id].copy()
+                    rng.shuffle(extra_indices)
+                    pools[class_id].extend(extra_indices)
+
+                batch.extend(pools[class_id][:self.samples_per_class])
+                pools[class_id] = pools[class_id][self.samples_per_class:]
+
+            rng.shuffle(batch)
+            yield batch
+
+    def __len__(self):
+        return self.num_batches
+
+
+def load_preprocessing_metadata(data_root):
+    '''Load class names and normalization values from preprocessing.'''
+    mapping_path = os.path.join(data_root, "label_mapping.json")
+
+    with open(mapping_path, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def create_balanced_train_loader(data_root, batch_size, seed=42):
+    '''
+    Load train.npz and return a strict class-balanced DataLoader.
+
+    The model receives one-hot labels.
+    The sampler uses integer label IDs.
+    '''
+    train_data = np.load(os.path.join(data_root, "train.npz"))
+
+    signals = torch.from_numpy(train_data["signals"]).float().unsqueeze(1)
+    label_ids = torch.from_numpy(train_data["labels"]).long()
+    labels_onehot = torch.from_numpy(train_data["labels_onehot"]).float()
+
+    assert signals.ndim == 3
+    assert signals.shape[1] == 1
+    assert len(signals) == len(label_ids) == len(labels_onehot)
+
+    assert labels_onehot.ndim == 2
+    assert torch.equal(labels_onehot.argmax(dim=1), label_ids)
+
+    dataset = TensorDataset(signals, labels_onehot)
+
+    batch_sampler = BalancedBatchSampler(
+        label_ids=label_ids,
+        batch_size=batch_size,
+        seed=seed,
+    )
+
+    return DataLoader(dataset, batch_sampler=batch_sampler)
+
 
 def load_vae_checkpoint(checkpoint_path, embedding_dim, num_classes, device='cpu'):
     '''
