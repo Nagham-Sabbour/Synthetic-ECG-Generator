@@ -39,8 +39,8 @@
     "STTC"
   ],
   "num_classes": 11,
-  "signal_mean": -4.071602930400897e-05,
-  "signal_std": 0.1309438033955228,
+  "signal_mean": -3.7517826390679344e-05,
+  "signal_std": 0.1310634380919624,
   "sampling_rate_hz": 100,
   "segment_duration_seconds": 5,
   "signal_shape": [
