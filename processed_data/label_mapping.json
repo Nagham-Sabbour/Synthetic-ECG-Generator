@@ -25,6 +25,22 @@
     "9": "NORM",
     "10": "STTC"
   },
+  "class_names": [
+    "CD",
+    "CD+HYP",
+    "CD+MI",
+    "CD+NORM",
+    "CD+STTC",
+    "HYP",
+    "HYP+STTC",
+    "MI",
+    "MI+STTC",
+    "NORM",
+    "STTC"
+  ],
+  "num_classes": 11,
+  "signal_mean": -4.071602930400897e-05,
+  "signal_std": 0.1309438033955228,
   "sampling_rate_hz": 100,
   "segment_duration_seconds": 5,
   "signal_shape": [
