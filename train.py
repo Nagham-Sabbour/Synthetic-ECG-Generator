@@ -175,11 +175,6 @@ def main() -> None:
 
     train_VAE(vae, num_epochs, train_loader, optimizer, beta=beta, device=device, checkpoint_dir=checkpoint_dir, plots_dir=plots_dir)
 
-    # TODO - load mean/std and class names from preprocessing
-    #mean = 
-    #std = 
-    #class_names = 
-
     # visualize results from the trained model
     generate_and_plot_samples(vae, mean, std, num_classes=num_classes, samples_per_class=1, output_dir=visuals_dir, filename_prefix='vae_generated', class_names=class_names, embedding_dim=embedding_dim, device=device)
     signals, labels = next(iter(train_loader))
@@ -188,5 +183,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-

@@ -4,6 +4,7 @@ import random
 
 import numpy as np
 import torch
+import torch.nn.functional as F
 from torch.utils.data import DataLoader, Sampler, TensorDataset
 
 from model import VAE
@@ -116,10 +117,43 @@ def load_vae_checkpoint(checkpoint_path, embedding_dim, num_classes, device='cpu
     vae = VAE(embedding_dim=embedding_dim, num_classes=num_classes)
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
-    vae.load_state_dict(checkpoint['model_state_dict'])
+
+    if "model_state_dict" in checkpoint:
+        state_dict = checkpoint["model_state_dict"]
+        loss = checkpoint.get("loss")
+    elif "vae_state_dict" in checkpoint:
+        state_dict = checkpoint["vae_state_dict"]
+        loss = checkpoint.get("recon_loss")
+    else:
+        raise KeyError("Checkpoint does not contain VAE weights.")
+
+    vae.load_state_dict(state_dict)
     vae.to(device)
+    vae.eval()
 
     print(f"Loaded VAE checkpoint from {checkpoint_path} "
-          f"(epoch={checkpoint.get('epoch')}, loss={checkpoint.get('loss'):.3f})")
+          f"(epoch={checkpoint.get('epoch')}, loss={loss})")
 
     return vae, checkpoint
+
+def generate_conditioned_signals(vae, label_ids, embedding_dim, num_classes, device):
+    """Generate normalized ECG segments for specified class IDs."""
+    vae.eval()
+
+    label_ids = torch.as_tensor(label_ids, dtype=torch.long, device=device)
+
+    labels_onehot = F.one_hot(
+        label_ids,
+        num_classes=num_classes,
+    ).float()
+
+    z = torch.randn(
+        len(label_ids),
+        embedding_dim,
+        device=device,
+    )
+
+    with torch.no_grad():
+        generated = vae.decoder(z, labels_onehot)
+
+    return generated.cpu()
