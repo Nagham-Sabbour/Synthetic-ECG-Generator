@@ -137,7 +137,7 @@ def load_vae_checkpoint(checkpoint_path, embedding_dim, num_classes, device='cpu
     return vae, checkpoint
 
 def generate_conditioned_signals(vae, label_ids, embedding_dim, num_classes, device):
-    """Generate normalized ECG segments for specified class IDs."""
+    '''Generate normalized ECG segments for specified class IDs.'''
     vae.eval()
 
     label_ids = torch.as_tensor(label_ids, dtype=torch.long, device=device)
