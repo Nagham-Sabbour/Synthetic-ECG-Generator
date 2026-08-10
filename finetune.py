@@ -181,11 +181,11 @@ def main() -> None:
     parser.add_argument("--trained-vae-filename", type=str, required=True)
     parser.add_argument("--data-root", type=str, default=DATA_ROOT)
     parser.add_argument("--batch-size", type=int, default=66)
-    parser.add_argument("--epochs", type=int, default=20)
+    parser.add_argument("--epochs", type=int, default=200)
     parser.add_argument("--decoder-lr", type=float, default=1e-3)
-    parser.add_argument("--discrim-lr", type=float, default=1e-3)
+    parser.add_argument("--discrim-lr", type=float, default=1e-4)
     parser.add_argument("--embedding-dim", type=int, default=32) #Note: must match the original vae training run
-    parser.add_argument("--loss-lambda-adv", type=float, default=1.0)
+    parser.add_argument("--loss-lambda-adv", type=float, default=50)
     parser.add_argument("--num-classes", type=int, default=11) #Note: must match the original vae training run
     parser.add_argument("--checkpoint-dir", type=str, default='checkpoints')
     parser.add_argument("--visuals-dir", type=str, default='visuals')
