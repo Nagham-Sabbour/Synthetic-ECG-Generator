@@ -6,13 +6,85 @@ import os
 import datetime
 
 from model import Discriminator
-from utils import load_vae_checkpoint, create_balanced_train_loader, load_preprocessing_metadata
+from utils import load_vae_checkpoint, create_balanced_train_loader, load_preprocessing_metadata, create_val_loader
 from visualize import generate_and_plot_samples, reconstruct_and_plot_samples, plot_training_losses
 
 DATA_ROOT = "./processed_data"
 
 
-def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer, discrim_optimizer, lambda_adv=1.0, device='cpu', checkpoint_dir='checkpoints', plots_dir='training_plots'):
+def validate_VAE_GAN(vae, discriminator, val_loader, lambda_adv=1.0, device='cpu'):
+    '''
+    Run one pass over the validation set with no gradient updates.
+    
+    Args:
+        vae: instance of model.VAE
+        discriminator: instance of model.Discriminator
+        val_loader: contains the validation set data
+        lambda_adv: weight factor for adversarial loss term
+        device: 'cpu' or 'cuda'
+
+    Returns:
+        avg_generator_loss, avg_recon_loss, avg_generator_adversarial_loss, avg_discrim_loss
+    '''
+    vae.eval()
+    discriminator.eval()
+
+    # initiate variables
+    total_generator_loss = 0
+    recon_loss_total = 0
+    generator_adversarial_loss_total = 0
+    discrim_loss_total = 0
+
+    with torch.no_grad():
+        for signals, labels in val_loader:
+            signals = signals.to(device)
+            labels = labels.to(device)
+
+            # DISCRIMINATOR:
+            
+            with torch.no_grad():
+                mean, logvar, recon_out = vae(signals, labels) 
+
+            # Discriminator loss
+            real_logits = discriminator(signals, labels)
+            fake_logits = discriminator(recon_out.detach(), labels)
+            real_loss = F.binary_cross_entropy_with_logits(real_logits, torch.ones_like(real_logits))
+            fake_loss = F.binary_cross_entropy_with_logits(fake_logits, torch.zeros_like(fake_logits))
+            discrim_loss = real_loss + fake_loss
+
+            # Update losses
+            discrim_loss_total += discrim_loss.item()
+
+            # GENERATOR (DECODER):
+            
+            mean, logvar, recon_out = vae(signals, labels) 
+
+            # Compute reconstruction loss
+            recon_loss = F.mse_loss(recon_out, signals, reduction='sum')
+
+            # Compute generator adversarial loss
+            fake_logits_for_gen = discriminator(recon_out, labels)
+            generator_adversarial_loss = F.binary_cross_entropy_with_logits(fake_logits_for_gen, torch.ones_like(fake_logits_for_gen))
+
+            # Overall generator loss (reconstruction loss + adversarial loss)
+            # KL loss was not included because the encoder is frozen so it would remain constant
+            generator_loss = recon_loss + (lambda_adv * generator_adversarial_loss)
+
+            # Update losses
+            total_generator_loss += generator_loss.item()
+            recon_loss_total += recon_loss.item()
+            generator_adversarial_loss_total += generator_adversarial_loss.item()
+
+    num_batches = len(val_loader)
+    avg_generator_loss = total_generator_loss / num_batches
+    avg_recon_loss = recon_loss_total / num_batches
+    avg_generator_adversarial_loss = generator_adversarial_loss_total / num_batches
+    avg_discrim_loss = discrim_loss_total / num_batches
+
+    return avg_generator_loss, avg_recon_loss, avg_generator_adversarial_loss, avg_discrim_loss
+
+
+def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, val_loader, vae_optimizer, discrim_optimizer, lambda_adv=1.0, device='cpu', checkpoint_dir='checkpoints', plots_dir='training_plots'):
     '''
     Fine-tune a pretrained VAE's decoder using a GAN-based discriminator.
 
@@ -21,12 +93,16 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
         discriminator: instance of model.Discriminator
         num_epochs: number of epochs to fine-tune for
         train_loader: contains the training data
+        val_loader: contains the validation data
         vae_optimizer: optimizer to use for training the VAE decoder
         discrim_optimizer: optimizer to use for training the GAN discriminator
         lambda_adv: weight factor for adversarial loss term
         device: 'cpu' or 'cuda'
         checkpoint_dir: directory name of where to save the model checkpoints
         plots_dir: directory name of where to save the training curve plots
+
+    Returns:
+        Best checkpoint path and final checkpoint path
     '''
 
     vae.to(device)
@@ -39,7 +115,7 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
     # for checkpoint saving
     os.makedirs(checkpoint_dir, exist_ok=True)
     run_timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-    best_recon_loss = float('inf')
+    best_generator_loss = float('inf')
     best_checkpoint_path = None
 
     # for training plots: track per-epoch loss averages across whole run 
@@ -47,6 +123,10 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
     recon_loss_history = []
     generator_adversarial_loss_history = []
     discrim_loss_history = []
+    val_generator_loss_history = []
+    val_recon_loss_history = []
+    val_generator_adversarial_loss_history = []
+    val_discrim_loss_history = []
     
     for epoch in range(num_epochs):
 
@@ -122,11 +202,18 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
         avg_generator_adversarial_loss = generator_adversarial_loss_total / num_batches
         avg_discrim_loss = discrim_loss_total / num_batches
 
+        # run validation
+        avg_val_generator_loss, avg_val_recon_loss, avg_val_generator_adversarial_loss, avg_val_discrim_loss = validate_VAE_GAN(vae, discriminator, val_loader, lambda_adv=lambda_adv, device=device)
+
         # append losses to history
         total_generator_loss_history.append(avg_generator_loss)
         recon_loss_history.append(avg_recon_loss)
         generator_adversarial_loss_history.append(avg_generator_adversarial_loss)
         discrim_loss_history.append(avg_discrim_loss)
+        val_generator_loss_history.append(avg_val_generator_loss)
+        val_recon_loss_history.append(avg_val_recon_loss)
+        val_generator_adversarial_loss_history.append(avg_val_generator_adversarial_loss)
+        val_discrim_loss_history.append(avg_val_discrim_loss)
 
         print(f"Epoch [{epoch+1}/{num_epochs}]  "
             f"Generator Loss: {avg_generator_loss:.3f}  "
@@ -134,9 +221,9 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
             f"Generator Adversarial Loss: {avg_generator_adversarial_loss:.3f}  "
             f"Discriminator Loss: {avg_discrim_loss:.3f}")
 
-        # save best checkpoint by avg train loss
-        if avg_recon_loss < best_recon_loss:
-            best_recon_loss = avg_recon_loss
+        # save best checkpoint by avg val loss
+        if avg_val_generator_loss < best_generator_loss:
+            best_generator_loss = avg_val_generator_loss
             best_checkpoint_path = os.path.join(checkpoint_dir, f"vae_gan_best_{run_timestamp}.pt")
             torch.save({
                 'vae_state_dict': vae.state_dict(),
@@ -162,7 +249,7 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
         'discrim_loss': avg_discrim_loss,
     }, final_checkpoint_path)
 
-    print(f"Saved best checkpoint (recon_loss={best_recon_loss:.3f}) to {best_checkpoint_path}")
+    print(f"Saved best checkpoint (generator_loss={best_generator_loss:.3f}) to {best_checkpoint_path}")
     print(f"Saved final checkpoint to {final_checkpoint_path}")
 
     # plot loss curves
@@ -172,6 +259,13 @@ def finetune_VAE_GAN(vae, discriminator, num_epochs, train_loader, vae_optimizer
         'Generator Adversarial Loss': generator_adversarial_loss_history,
         'Discriminator Loss': discrim_loss_history,
     }, output_dir=plots_dir, filename_prefix='vaegan_finetuning_loss')
+
+    plot_training_losses({
+        'Total Generator Loss (Val)': val_generator_loss_history,
+        'Reconstruction Loss (Val)': val_recon_loss_history,
+        'Generator Adversarial Loss (Val)': val_generator_adversarial_loss_history,
+        'Discriminator Loss (Val)': val_discrim_loss_history,
+    }, output_dir=plots_dir, filename_prefix='vaegan_validation_loss')
 
     return best_checkpoint_path, final_checkpoint_path
 
@@ -226,6 +320,9 @@ def main() -> None:
         seed=42,
     )
 
+    # load validation set
+    val_loader = create_val_loader(data_root=args.data_root, batch_size=batch_size)
+
     # load the vae checkpoint
     vae, _ = load_vae_checkpoint(
         checkpoint_path = os.path.join(checkpoint_dir, trained_vae_filename),
@@ -243,12 +340,18 @@ def main() -> None:
     vae_optimizer = torch.optim.Adam(vae_params, lr=decoder_lr)
 
 
-    finetune_VAE_GAN(vae, discrim, num_epochs, train_loader, vae_optimizer, discrim_optimizer, lambda_adv, device, checkpoint_dir=checkpoint_dir, plots_dir=plots_dir)
+    best_checkpoint_path, _ = finetune_VAE_GAN(vae, discrim, num_epochs, train_loader, val_loader, vae_optimizer, discrim_optimizer, lambda_adv, device, checkpoint_dir=checkpoint_dir, plots_dir=plots_dir)
 
-    # visualize results from the trained model
-    generate_and_plot_samples(vae, mean, std, num_classes=num_classes, samples_per_class=1, output_dir=visuals_dir, filename_prefix='vae_gan_generated', class_names=class_names, embedding_dim=embedding_dim, device=device)
-    signals, labels = next(iter(train_loader))
-    reconstruct_and_plot_samples(vae, signals, labels, mean, std, num_samples=6, output_dir=visuals_dir, filename_prefix='vae_gan_reconstructed', class_names=class_names, device=device)
+    # visualize results from the best trained model
+    best_vae, _ = load_vae_checkpoint(
+        checkpoint_path=best_checkpoint_path,
+        embedding_dim=embedding_dim,
+        num_classes=num_classes,
+        device=device,
+    )
+    generate_and_plot_samples(best_vae, mean, std, num_classes=num_classes, samples_per_class=1, output_dir=visuals_dir, filename_prefix='vae_gan_generated', class_names=class_names, embedding_dim=embedding_dim, device=device)
+    signals, labels = next(iter(val_loader))
+    reconstruct_and_plot_samples(best_vae, signals, labels, mean, std, num_samples=6, output_dir=visuals_dir, filename_prefix='vae_gan_reconstructed', class_names=class_names, device=device)
     
 
 if __name__ == "__main__":
