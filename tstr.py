@@ -368,9 +368,10 @@ def main():
 
     parser.add_argument("--data-root", default="./processed_data")
     parser.add_argument("--checkpoint-path", required=True)
-    parser.add_argument("--results-root", default="./results")
-    parser.add_argument("--embedding-dim", type=int, default=32)
-    parser.add_argument("--samples-per-class", type=int, default=300)
+    parser.add_argument("--results-root", default="./test_runs")
+    parser.add_argument("--embedding-dim", type=int, default=64)
+    parser.add_argument("--real-samples-per-class", type=int, default=300)
+    parser.add_argument("--synthetic-samples-per-class", type=int, default=1000)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--classifier-epochs", type=int, default=80)
     parser.add_argument("--classifier-patience", type=int, default=12)
@@ -419,7 +420,7 @@ def main():
         select_balanced_real_training_set(
             train_data=train_data,
             num_classes=num_classes,
-            samples_per_class=args.samples_per_class,
+            samples_per_class=args.real_samples_per_class,
             seed=args.seed,
         )
     )
@@ -429,7 +430,7 @@ def main():
             vae=vae,
             embedding_dim=args.embedding_dim,
             num_classes=num_classes,
-            samples_per_class=args.samples_per_class,
+            samples_per_class=args.synthetic_samples_per_class,
             device=device,
         )
     )
@@ -515,7 +516,8 @@ def main():
     )
 
     results = {
-        "samples_per_class": args.samples_per_class,
+        "real_samples_per_class": args.real_samples_per_class,
+        "synthetic_samples_per_class": args.synthetic_samples_per_class,
         "classifier_epochs_requested": args.classifier_epochs,
         "classifier_patience": args.classifier_patience,
         "train_on_real_test_on_real": {
