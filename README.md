@@ -67,7 +67,7 @@ To run the computation of the evaluation metrics, run the following command `pyt
 - `--seed` (Seed for reproducible runs)
 
 #### Outputs
-Default location of the evaluation results is `/results`.
+Default location of the evaluation results is `/test_runs`.
 
 ### TSTR
 To run the TSTR (train on synthetic, test on real), run the following command `python tstr.py` with the following arguments:
@@ -77,6 +77,7 @@ To run the TSTR (train on synthetic, test on real), run the following command `p
 - `--embedding-dim` (Embedding/Latent dimension, must match the model)
 - `--real-samples-per-class` (Number of real samples to use per class)
 - `--synthetic-samples-per-class` (Number of synthetic samples to use per class)
+- `--mixed-synthetic-samples-per-class` (Number of synthetic samples to use per class combined with 300 real)
 - `--seed` (Seed for reproducible runs)
 - `--classifier-epochs` (Number of epochs to run the classifier)
 - `--classifier-patience` (Number of epochs to wait for classifer improvement before early stopping)
