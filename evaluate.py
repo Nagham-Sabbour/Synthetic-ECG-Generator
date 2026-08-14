@@ -414,7 +414,7 @@ def main():
 
     parser.add_argument("--data-root", default="./processed_data")
     parser.add_argument("--checkpoint-path", required=True)
-    parser.add_argument("--results-root", default="./results")
+    parser.add_argument("--results-root", default="./test_runs")
     parser.add_argument("--embedding-dim", type=int, default=64)
     parser.add_argument("--samples-per-class", type=int, default=100)
     parser.add_argument("--seed", type=int, default=42)
