@@ -265,6 +265,7 @@ def main():
     parser.add_argument("--embedding-dim", type=int, default=64)
     parser.add_argument("--real-samples-per-class", type=int, default=300)
     parser.add_argument("--synthetic-samples-per-class", type=int, default=1000)
+    parser.add_argument("--mixed-synthetic-samples-per-class", type=int, default=300)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--classifier-epochs", type=int, default=80)
     parser.add_argument("--classifier-patience", type=int, default=12)
@@ -307,6 +308,24 @@ def main():
         num_classes,
         args.synthetic_samples_per_class,
         device,
+    )
+
+    mixed_synthetic_signals, mixed_synthetic_labels = generate_balanced_synthetic_training_set(
+        vae,
+        args.embedding_dim,
+        num_classes,
+        args.mixed_synthetic_samples_per_class,
+        device,
+    )
+
+    mixed_train_signals = np.concatenate(
+        [real_train_signals, mixed_synthetic_signals],
+        axis=0,
+    )
+
+    mixed_train_labels = np.concatenate(
+        [real_train_labels, mixed_synthetic_labels],
+        axis=0,
     )
 
     print("\nTraining classifier on real ECGs...")
@@ -357,8 +376,35 @@ def main():
         device,
     )
 
+    print("\nTraining classifier on real and synthetic ECGs...")
+    mixed_classifier, mixed_history = train_classifier(
+        mixed_train_signals,
+        mixed_train_labels,
+        validation_data["signals"],
+        validation_data["labels"],
+        num_classes,
+        class_names,
+        args.classifier_epochs,
+        args.batch_size,
+        args.learning_rate,
+        args.classifier_patience,
+        args.seed,
+        device,
+    )
+
+    tsrtr_results = evaluate_classifier(
+        mixed_classifier,
+        test_data["signals"],
+        test_data["labels"],
+        class_names,
+        args.batch_size,
+        device,
+    )
+
     plot_classifier_history(real_history, "TRTR Classifier", output_dir / "trtr_training_history.png")
     plot_classifier_history(synthetic_history, "TSTR Classifier", output_dir / "tstr_training_history.png")
+    plot_classifier_history(mixed_history, "TSRTR Classifier", output_dir / "tsrtr_training_history.png")
+
     save_classifier_diagnostics(
         trtr_results,
         class_names,
@@ -374,9 +420,18 @@ def main():
         "tstr",
     )
 
+    save_classifier_diagnostics(
+        tsrtr_results,
+        class_names,
+        "TSRTR: Train on Real and Synthetic, Test on Real",
+        output_dir,
+        "tsrtr",
+    )
+
     results = {
         "real_samples_per_class": args.real_samples_per_class,
         "synthetic_samples_per_class": args.synthetic_samples_per_class,
+        "mixed_synthetic_samples_per_class": args.mixed_synthetic_samples_per_class,
         "classifier_epochs_requested": args.classifier_epochs,
         "classifier_patience": args.classifier_patience,
         "train_on_real_test_on_real": {
@@ -389,6 +444,13 @@ def main():
             "macro_f1": tstr_results["macro_f1"],
             "classification_report": tstr_results["classification_report"],
         },
+        "train_on_real_and_synthetic_test_on_real": {
+            "real_samples_per_class": args.real_samples_per_class,
+            "synthetic_samples_per_class": args.mixed_synthetic_samples_per_class,
+            "accuracy": tsrtr_results["accuracy"],
+            "macro_f1": tsrtr_results["macro_f1"],
+            "classification_report": tsrtr_results["classification_report"],
+        },
     }
     with open(output_dir / "tstr_results.json", "w", encoding="utf-8") as file:
         json.dump(results, file, indent=2)
@@ -398,6 +460,8 @@ def main():
     print(f"TRTR macro F1: {trtr_results['macro_f1']:.4f}")
     print(f"TSTR accuracy: {tstr_results['accuracy']:.4f}")
     print(f"TSTR macro F1: {tstr_results['macro_f1']:.4f}")
+    print(f"TSRTR accuracy: {tsrtr_results['accuracy']:.4f}")
+    print(f"TSRTR macro F1: {tsrtr_results['macro_f1']:.4f}")
     print(f"\nSaved results to: {output_dir.resolve()}")
 
 
