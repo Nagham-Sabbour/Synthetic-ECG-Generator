@@ -107,7 +107,7 @@ def create_val_loader(data_root, batch_size):
 
 def load_vae_checkpoint(checkpoint_path, embedding_dim, num_classes, device="cpu"):
     '''
-    oad either a VAE or VAE-GAN checkpoint into a VAE model
+    Load either a VAE or VAE-GAN checkpoint into a VAE model
 
     Args:
         checkpoint_path: path to the .pt checkpoint file

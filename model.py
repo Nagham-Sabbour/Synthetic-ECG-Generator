@@ -153,9 +153,20 @@ class Decoder(nn.Module):
 
 
 class VAE(nn.Module):
-    '''Conditional VAE model containing encoder and decoder for 500-sample Lead II ECG segments'''
 
     def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, embedding_dim=DEFAULT_EMBEDDING_DIM, num_classes=DEFAULT_NUM_CLASSES):
+        '''
+        Conditional VAE model containing encoder and decoder for 500-sample Lead II ECG segments
+
+        Args:
+            in_channels: number of input channels for encoder / output channels for decoder - is 1 for preprocessed ECG dataset (1 lead)
+            hidden_channels1: number of channels after first conv layer of encoder / before fourth (last) conv layer of decoder
+            hidden_channels2: number of channels after second conv layer / before third conv layer of decoder
+            hidden_channels3: number of channels after third conv layer / before second conv layer of decoder
+            hidden_channels4: number of channels after fourth conv layer / before first conv layer of decoder
+            embedding_dim = number of output channels for encoder / input channels for decoder
+            num_classes: number of diagnostic classes for label conditioning
+        '''
         super().__init__()
 
         self.encoder = Encoder(in_channels=in_channels, hidden_channels1=hidden_channels1, hidden_channels2=hidden_channels2, hidden_channels3=hidden_channels3, hidden_channels4=hidden_channels4, embedding_dim=embedding_dim, num_classes=num_classes)
@@ -195,7 +206,17 @@ class VAE(nn.Module):
 class Discriminator(nn.Module):
 
     def __init__(self, in_channels=1, hidden_channels1=16, hidden_channels2=32, hidden_channels3=64, hidden_channels4=128, num_classes=DEFAULT_NUM_CLASSES):
-        '''Class-conditional discriminator for VAE-GAN fine-tuning  to classify real vs fake samples'''
+        '''
+        Class-conditional discriminator for VAE-GAN fine-tuning  to classify real vs fake samples
+        
+        Args:
+            in_channels: is 1 for preprocessed ECG dataset (1 lead)
+            hidden_channels1: number of channels after first conv layer
+            hidden_channels2: number of channels after second conv layer
+            hidden_channels3: number of channels after third conv layer
+            hidden_channels4: number of channels after fourth conv layer
+            num_classes: number of diagnostic classes for label conditioning
+        '''
         super().__init__()
 
         self.relu = nn.ReLU()
