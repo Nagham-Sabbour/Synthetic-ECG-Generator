@@ -265,7 +265,7 @@ def main():
     parser.add_argument("--embedding-dim", type=int, default=64)
     parser.add_argument("--real-samples-per-class", type=int, default=300)
     parser.add_argument("--synthetic-samples-per-class", type=int, default=1000)
-    parser.add_argument("--mixed-synthetic-samples-per-class", type=int, default=300)
+    parser.add_argument("--mixed-synthetic-samples-per-class", type=int, default=100)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--classifier-epochs", type=int, default=80)
     parser.add_argument("--classifier-patience", type=int, default=12)
