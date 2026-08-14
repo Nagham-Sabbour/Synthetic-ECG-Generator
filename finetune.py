@@ -1,20 +1,30 @@
+import argparse
+import datetime
+import os
+
 import torch
 import torch.nn.functional as F
 
-import argparse
-import os
-import datetime
-
 from model import Discriminator
-from utils import load_vae_checkpoint, create_balanced_train_loader, load_preprocessing_metadata, create_val_loader
-from visualize import generate_and_plot_samples, reconstruct_and_plot_samples, plot_training_losses
+from utils import (
+    create_balanced_train_loader,
+    create_val_loader,
+    load_preprocessing_metadata,
+    load_vae_checkpoint,
+)
+from visualize import (
+    generate_and_plot_samples,
+    plot_training_losses,
+    reconstruct_and_plot_samples,
+)
+
 
 DATA_ROOT = "./processed_data"
 
 
 def validate_VAE_GAN(vae, discriminator, val_loader, lambda_adv=1.0, device='cpu'):
     '''
-    Run one pass over the validation set with no gradient updates.
+    Evaluate the VAE-GAN over the validation set with no gradient updates.
     
     Args:
         vae: instance of model.VAE
@@ -278,7 +288,7 @@ def main() -> None:
     parser.add_argument("--epochs", type=int, default=200)
     parser.add_argument("--decoder-lr", type=float, default=1e-3)
     parser.add_argument("--discrim-lr", type=float, default=1e-4)
-    parser.add_argument("--embedding-dim", type=int, default=32) #Note: must match the original vae training run
+    parser.add_argument("--embedding-dim", type=int, default=64) #Note: must match the original vae training run
     parser.add_argument("--loss-lambda-adv", type=float, default=50)
     parser.add_argument("--num-classes", type=int, default=11) #Note: must match the original vae training run
     parser.add_argument("--checkpoint-dir", type=str, default='checkpoints')

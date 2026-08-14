@@ -9,13 +9,15 @@ from torch.utils.data import DataLoader, Sampler, TensorDataset
 
 from model import VAE
 
+
 class BalancedBatchSampler(Sampler):
-    '''Create batches with an equal number of samples from every class.'''
+    '''Create batches with the same number of ECGs from every class'''
 
     def __init__(self, label_ids, batch_size, seed=42):
         self.class_ids = torch.unique(label_ids).tolist()
         self.num_classes = len(self.class_ids)
 
+        assert self.num_classes > 0, "At least one class is required"
         assert batch_size % self.num_classes == 0, (
             f"batch_size must be divisible by {self.num_classes} classes"
         )
@@ -24,22 +26,23 @@ class BalancedBatchSampler(Sampler):
         self.num_batches = len(label_ids) // batch_size
         self.seed = seed
         self.epoch = 0
-
         self.class_indices = {
             class_id: torch.where(label_ids == class_id)[0].tolist()
             for class_id in self.class_ids
         }
 
     def __iter__(self):
-        # Different order every epoch, but reproducible across complete runs.
+        # The seed changes each epoch but stays reproducible across runs
         rng = random.Random(self.seed + self.epoch)
         self.epoch += 1
 
-        pools = {}
+        pools = {
+            class_id: indices.copy()
+            for class_id, indices in self.class_indices.items()
+        }
 
-        for class_id, indices in self.class_indices.items():
-            pools[class_id] = indices.copy()
-            rng.shuffle(pools[class_id])
+        for indices in pools.values():
+            rng.shuffle(indices)
 
         for _ in range(self.num_batches):
             batch = []
@@ -61,7 +64,7 @@ class BalancedBatchSampler(Sampler):
 
 
 def load_preprocessing_metadata(data_root):
-    '''Load class names and normalization values from preprocessing.'''
+    '''Load the class names and normalization values from preprocessing'''
     mapping_path = os.path.join(data_root, "label_mapping.json")
 
     with open(mapping_path, "r", encoding="utf-8") as file:
@@ -69,12 +72,7 @@ def load_preprocessing_metadata(data_root):
 
 
 def create_balanced_train_loader(data_root, batch_size, seed=42):
-    '''
-    Load train.npz and return a strict class-balanced DataLoader.
-
-    The model receives one-hot labels.
-    The sampler uses integer label IDs.
-    '''
+    '''Load the training split with strict class-balanced batches'''
     train_data = np.load(os.path.join(data_root, "train.npz"))
 
     signals = torch.from_numpy(train_data["signals"]).float().unsqueeze(1)
@@ -84,35 +82,32 @@ def create_balanced_train_loader(data_root, batch_size, seed=42):
     assert signals.ndim == 3
     assert signals.shape[1] == 1
     assert len(signals) == len(label_ids) == len(labels_onehot)
-
     assert labels_onehot.ndim == 2
     assert torch.equal(labels_onehot.argmax(dim=1), label_ids)
 
     dataset = TensorDataset(signals, labels_onehot)
-
-    batch_sampler = BalancedBatchSampler(
-        label_ids=label_ids,
-        batch_size=batch_size,
-        seed=seed,
-    )
+    batch_sampler = BalancedBatchSampler(label_ids, batch_size, seed)
 
     return DataLoader(dataset, batch_sampler=batch_sampler)
 
+
 def create_val_loader(data_root, batch_size):
-    '''
-    Load validation.npz and return a DataLoader for it. 
-    '''
+    '''Load the validation split without balancing or shuffling'''
     val_data = np.load(os.path.join(data_root, "validation.npz"))
-    val_signals = torch.from_numpy(val_data["signals"]).float().unsqueeze(1)
-    val_labels_onehot = torch.from_numpy(val_data["labels_onehot"]).float()
-    val_dataset = TensorDataset(val_signals, val_labels_onehot)
-    
-    return DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    signals = torch.from_numpy(val_data["signals"]).float().unsqueeze(1)
+    labels_onehot = torch.from_numpy(val_data["labels_onehot"]).float()
+
+    assert signals.ndim == 3
+    assert signals.shape[1] == 1
+    assert len(signals) == len(labels_onehot)
+
+    dataset = TensorDataset(signals, labels_onehot)
+    return DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
 
-def load_vae_checkpoint(checkpoint_path, embedding_dim, num_classes, device='cpu'):
+def load_vae_checkpoint(checkpoint_path, embedding_dim, num_classes, device="cpu"):
     '''
-    Load a pretrained VAE from a checkpoint file saved by train_VAE.
+    Load either a VAE or VAE-GAN checkpoint into a VAE model
 
     Args:
         checkpoint_path: path to the .pt checkpoint file
@@ -126,45 +121,40 @@ def load_vae_checkpoint(checkpoint_path, embedding_dim, num_classes, device='cpu
     '''
 
     vae = VAE(embedding_dim=embedding_dim, num_classes=num_classes)
-
     checkpoint = torch.load(checkpoint_path, map_location=device)
 
     if "model_state_dict" in checkpoint:
         state_dict = checkpoint["model_state_dict"]
-        loss = checkpoint.get("loss")
+        loss = checkpoint.get("validation_loss", checkpoint.get("loss"))
     elif "vae_state_dict" in checkpoint:
         state_dict = checkpoint["vae_state_dict"]
-        loss = checkpoint.get("recon_loss")
+        loss = checkpoint.get(
+            "validation_generator_loss",
+            checkpoint.get("generator_loss", checkpoint.get("recon_loss")),
+        )
     else:
-        raise KeyError("Checkpoint does not contain VAE weights.")
+        raise KeyError("Checkpoint does not contain VAE weights")
 
     vae.load_state_dict(state_dict)
     vae.to(device)
     vae.eval()
 
-    print(f"Loaded VAE checkpoint from {checkpoint_path} "
-          f"(epoch={checkpoint.get('epoch')}, loss={loss})")
+    print(
+        f"Loaded VAE checkpoint from {checkpoint_path} "
+        f"(epoch={checkpoint.get('epoch')}, validation_loss={loss})"
+    )
 
     return vae, checkpoint
 
+
 def generate_conditioned_signals(vae, label_ids, embedding_dim, num_classes, device):
-    '''Generate normalized ECG segments for specified class IDs.'''
+    '''Generate normalized ECG segments for the requested class IDs'''
     vae.eval()
-
     label_ids = torch.as_tensor(label_ids, dtype=torch.long, device=device)
-
-    labels_onehot = F.one_hot(
-        label_ids,
-        num_classes=num_classes,
-    ).float()
-
-    z = torch.randn(
-        len(label_ids),
-        embedding_dim,
-        device=device,
-    )
+    labels_onehot = F.one_hot(label_ids, num_classes=num_classes).float()
+    latent = torch.randn(len(label_ids), embedding_dim, device=device)
 
     with torch.no_grad():
-        generated = vae.decoder(z, labels_onehot)
+        generated = vae.decoder(latent, labels_onehot)
 
     return generated.cpu()
