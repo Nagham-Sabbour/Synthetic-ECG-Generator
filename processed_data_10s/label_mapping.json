@@ -1,0 +1,49 @@
+{
+  "label_to_id": {
+    "CD": 0,
+    "CD+HYP": 1,
+    "CD+MI": 2,
+    "CD+NORM": 3,
+    "CD+STTC": 4,
+    "HYP": 5,
+    "HYP+STTC": 6,
+    "MI": 7,
+    "MI+STTC": 8,
+    "NORM": 9,
+    "STTC": 10
+  },
+  "id_to_label": {
+    "0": "CD",
+    "1": "CD+HYP",
+    "2": "CD+MI",
+    "3": "CD+NORM",
+    "4": "CD+STTC",
+    "5": "HYP",
+    "6": "HYP+STTC",
+    "7": "MI",
+    "8": "MI+STTC",
+    "9": "NORM",
+    "10": "STTC"
+  },
+  "class_names": [
+    "CD",
+    "CD+HYP",
+    "CD+MI",
+    "CD+NORM",
+    "CD+STTC",
+    "HYP",
+    "HYP+STTC",
+    "MI",
+    "MI+STTC",
+    "NORM",
+    "STTC"
+  ],
+  "num_classes": 11,
+  "signal_mean": -5.1487817161648064e-05,
+  "signal_std": 0.13095196835956635,
+  "sampling_rate_hz": 100,
+  "segment_duration_seconds": 10,
+  "signal_shape": [
+    1000
+  ]
+}

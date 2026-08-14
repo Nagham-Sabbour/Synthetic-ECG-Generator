@@ -174,7 +174,7 @@ def plot_psd_by_class(
             sampling_rate,
         )
 
-        # Difference between real and generated frequency content.
+        # Compare real and generated frequency content on a log scale
         psd_log_mse = np.mean(
             (
                 np.log10(real_psd + 1e-12)
@@ -211,7 +211,7 @@ def plot_psd_by_class(
         axis.grid(True, alpha=0.3)
         axis.legend()
 
-    # Hide any unused subplot.
+    # Hide an unused subplot when the number of classes is odd
     for index in range(num_classes, num_rows * 2):
         axes[index // 2, index % 2].axis("off")
 
@@ -358,6 +358,7 @@ def evaluate_r_peaks(
 
     return pd.DataFrame(rows)
 
+
 def compare_rhythm_distributions(
     real_r_peaks,
     generated_r_peaks,
@@ -414,7 +415,7 @@ def main():
     parser.add_argument("--data-root", default="./processed_data")
     parser.add_argument("--checkpoint-path", required=True)
     parser.add_argument("--results-root", default="./results")
-    parser.add_argument("--embedding-dim", type=int, default=32)
+    parser.add_argument("--embedding-dim", type=int, default=64)
     parser.add_argument("--samples-per-class", type=int, default=100)
     parser.add_argument("--seed", type=int, default=42)
 
@@ -454,7 +455,7 @@ def main():
         device=device,
     )
 
-    # 1. Visual inspection: one generated ECG for every class.
+    # Save one generated ECG for each class
     generate_and_plot_samples(
         vae=vae,
         mean=signal_mean,
@@ -468,7 +469,7 @@ def main():
         device=device,
     )
 
-    # Create equal-size real and generated sets for fair PSD and R-peak comparison.
+    # Use equal class sizes for fair PSD and R-peak comparisons
     (
         real_normalized,
         real_labels,
@@ -484,7 +485,7 @@ def main():
         seed=args.seed,
     )
 
-    # Convert back to mV for physiological signal analysis.
+    # Convert normalized signals back to mV for physiological metrics
     real_signals = real_normalized * signal_std + signal_mean
     generated_signals = generated_normalized * signal_std + signal_mean
     validation_signals = validation_data["signals"] * signal_std + signal_mean
@@ -522,7 +523,7 @@ def main():
         index=False,
     )
 
-    # 2. PSD comparison.
+    # Save PSD comparisons for each class
     psd_scores = plot_psd_by_class(
         real_signals=real_signals,
         real_labels=real_labels,
@@ -538,7 +539,7 @@ def main():
         index=False,
     )
 
-    # 3. R-peak plausibility comparison.
+    # Compare R-peak and heart-rate features with validation data
     real_r_peaks = evaluate_r_peaks(
         signals=real_signals,
         labels=real_labels,

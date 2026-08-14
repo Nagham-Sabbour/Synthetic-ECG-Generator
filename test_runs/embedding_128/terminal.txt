@@ -1,0 +1,509 @@
+parser.add_argument("--embedding-dim", type=int, default=128)
+
+VAE:
+Epochs = 200
+Beta=0.5
+
+Finetune:
+Epochs = 200
+Lambda to 50
+Discrim_lr = 1e-4
+
+python train.py
+Epoch [1/200]  Total Loss: 22173.147  Reconstruction Loss: 18964.629  KL Divergence Loss: 6417.037
+Epoch [2/200]  Total Loss: 12089.056  Reconstruction Loss: 7781.157  KL Divergence Loss: 8615.798
+Epoch [3/200]  Total Loss: 10355.997  Reconstruction Loss: 6079.328  KL Divergence Loss: 8553.338
+Epoch [4/200]  Total Loss: 9503.997  Reconstruction Loss: 5345.085  KL Divergence Loss: 8317.823
+Epoch [5/200]  Total Loss: 8736.073  Reconstruction Loss: 4692.362  KL Divergence Loss: 8087.422
+Epoch [6/200]  Total Loss: 8303.258  Reconstruction Loss: 4329.906  KL Divergence Loss: 7946.704
+Epoch [7/200]  Total Loss: 7955.057  Reconstruction Loss: 4065.761  KL Divergence Loss: 7778.593
+Epoch [8/200]  Total Loss: 7601.127  Reconstruction Loss: 3765.496  KL Divergence Loss: 7671.262
+Epoch [9/200]  Total Loss: 7457.245  Reconstruction Loss: 3670.780  KL Divergence Loss: 7572.931
+Epoch [10/200]  Total Loss: 7177.422  Reconstruction Loss: 3444.227  KL Divergence Loss: 7466.389
+Epoch [11/200]  Total Loss: 7070.355  Reconstruction Loss: 3353.023  KL Divergence Loss: 7434.664
+Epoch [12/200]  Total Loss: 6921.414  Reconstruction Loss: 3225.506  KL Divergence Loss: 7391.816
+Epoch [13/200]  Total Loss: 6866.639  Reconstruction Loss: 3189.524  KL Divergence Loss: 7354.229
+Epoch [14/200]  Total Loss: 6773.021  Reconstruction Loss: 3117.633  KL Divergence Loss: 7310.776
+Epoch [15/200]  Total Loss: 6697.640  Reconstruction Loss: 3066.595  KL Divergence Loss: 7262.089
+Epoch [16/200]  Total Loss: 6622.916  Reconstruction Loss: 2998.103  KL Divergence Loss: 7249.627
+Epoch [17/200]  Total Loss: 6579.827  Reconstruction Loss: 2965.326  KL Divergence Loss: 7229.002
+Epoch [18/200]  Total Loss: 6542.468  Reconstruction Loss: 2925.656  KL Divergence Loss: 7233.624
+Epoch [19/200]  Total Loss: 6503.961  Reconstruction Loss: 2906.057  KL Divergence Loss: 7195.808
+Epoch [20/200]  Total Loss: 6430.014  Reconstruction Loss: 2835.501  KL Divergence Loss: 7189.026
+Epoch [21/200]  Total Loss: 6398.754  Reconstruction Loss: 2812.031  KL Divergence Loss: 7173.446
+Epoch [22/200]  Total Loss: 6370.978  Reconstruction Loss: 2782.833  KL Divergence Loss: 7176.291
+Epoch [23/200]  Total Loss: 6325.368  Reconstruction Loss: 2752.872  KL Divergence Loss: 7144.992
+Epoch [24/200]  Total Loss: 6311.890  Reconstruction Loss: 2745.536  KL Divergence Loss: 7132.708
+Epoch [25/200]  Total Loss: 6260.412  Reconstruction Loss: 2696.367  KL Divergence Loss: 7128.091
+Epoch [26/200]  Total Loss: 6237.339  Reconstruction Loss: 2678.730  KL Divergence Loss: 7117.218
+Epoch [27/200]  Total Loss: 6261.750  Reconstruction Loss: 2706.466  KL Divergence Loss: 7110.568
+Epoch [28/200]  Total Loss: 6217.329  Reconstruction Loss: 2668.895  KL Divergence Loss: 7096.868
+Epoch [29/200]  Total Loss: 6177.209  Reconstruction Loss: 2628.927  KL Divergence Loss: 7096.565
+Epoch [30/200]  Total Loss: 6201.234  Reconstruction Loss: 2654.379  KL Divergence Loss: 7093.709
+Epoch [31/200]  Total Loss: 6170.520  Reconstruction Loss: 2629.740  KL Divergence Loss: 7081.561
+Epoch [32/200]  Total Loss: 6128.544  Reconstruction Loss: 2594.533  KL Divergence Loss: 7068.021
+Epoch [33/200]  Total Loss: 6084.142  Reconstruction Loss: 2549.400  KL Divergence Loss: 7069.485
+Epoch [34/200]  Total Loss: 6099.199  Reconstruction Loss: 2563.969  KL Divergence Loss: 7070.460
+Epoch [35/200]  Total Loss: 6104.576  Reconstruction Loss: 2574.416  KL Divergence Loss: 7060.318
+Epoch [36/200]  Total Loss: 6087.836  Reconstruction Loss: 2561.804  KL Divergence Loss: 7052.064
+Epoch [37/200]  Total Loss: 6051.458  Reconstruction Loss: 2530.390  KL Divergence Loss: 7042.135
+Epoch [38/200]  Total Loss: 6013.190  Reconstruction Loss: 2501.262  KL Divergence Loss: 7023.855
+Epoch [39/200]  Total Loss: 6018.755  Reconstruction Loss: 2502.600  KL Divergence Loss: 7032.310
+Epoch [40/200]  Total Loss: 6002.698  Reconstruction Loss: 2492.839  KL Divergence Loss: 7019.718
+Epoch [41/200]  Total Loss: 5986.870  Reconstruction Loss: 2477.015  KL Divergence Loss: 7019.711
+Epoch [42/200]  Total Loss: 5998.901  Reconstruction Loss: 2494.287  KL Divergence Loss: 7009.227
+Epoch [43/200]  Total Loss: 5956.644  Reconstruction Loss: 2445.835  KL Divergence Loss: 7021.618
+Epoch [44/200]  Total Loss: 5949.854  Reconstruction Loss: 2443.938  KL Divergence Loss: 7011.832
+Epoch [45/200]  Total Loss: 5925.742  Reconstruction Loss: 2427.724  KL Divergence Loss: 6996.036
+Epoch [46/200]  Total Loss: 5959.241  Reconstruction Loss: 2463.829  KL Divergence Loss: 6990.825
+Epoch [47/200]  Total Loss: 5918.836  Reconstruction Loss: 2422.772  KL Divergence Loss: 6992.129
+Epoch [48/200]  Total Loss: 5901.797  Reconstruction Loss: 2419.112  KL Divergence Loss: 6965.371
+Epoch [49/200]  Total Loss: 5912.291  Reconstruction Loss: 2423.027  KL Divergence Loss: 6978.529
+Epoch [50/200]  Total Loss: 5930.156  Reconstruction Loss: 2434.574  KL Divergence Loss: 6991.165
+Epoch [51/200]  Total Loss: 5896.966  Reconstruction Loss: 2410.352  KL Divergence Loss: 6973.229
+Epoch [52/200]  Total Loss: 5914.950  Reconstruction Loss: 2425.008  KL Divergence Loss: 6979.885
+Epoch [53/200]  Total Loss: 5865.837  Reconstruction Loss: 2387.883  KL Divergence Loss: 6955.907
+Epoch [54/200]  Total Loss: 5865.831  Reconstruction Loss: 2387.580  KL Divergence Loss: 6956.503
+Epoch [55/200]  Total Loss: 5865.102  Reconstruction Loss: 2380.640  KL Divergence Loss: 6968.925
+Epoch [56/200]  Total Loss: 5848.964  Reconstruction Loss: 2374.233  KL Divergence Loss: 6949.462
+Epoch [57/200]  Total Loss: 5825.684  Reconstruction Loss: 2357.575  KL Divergence Loss: 6936.219
+Epoch [58/200]  Total Loss: 5843.220  Reconstruction Loss: 2373.134  KL Divergence Loss: 6940.172
+Epoch [59/200]  Total Loss: 5813.965  Reconstruction Loss: 2341.378  KL Divergence Loss: 6945.176
+Epoch [60/200]  Total Loss: 5842.949  Reconstruction Loss: 2371.922  KL Divergence Loss: 6942.054
+Epoch [61/200]  Total Loss: 5835.459  Reconstruction Loss: 2363.461  KL Divergence Loss: 6943.995
+Epoch [62/200]  Total Loss: 5800.281  Reconstruction Loss: 2335.525  KL Divergence Loss: 6929.510
+Epoch [63/200]  Total Loss: 5812.505  Reconstruction Loss: 2347.767  KL Divergence Loss: 6929.476
+Epoch [64/200]  Total Loss: 5781.781  Reconstruction Loss: 2323.349  KL Divergence Loss: 6916.866
+Epoch [65/200]  Total Loss: 5753.811  Reconstruction Loss: 2297.575  KL Divergence Loss: 6912.472
+Epoch [66/200]  Total Loss: 5778.380  Reconstruction Loss: 2320.210  KL Divergence Loss: 6916.340
+Epoch [67/200]  Total Loss: 5758.459  Reconstruction Loss: 2298.671  KL Divergence Loss: 6919.577
+Epoch [68/200]  Total Loss: 5791.195  Reconstruction Loss: 2333.729  KL Divergence Loss: 6914.932
+Epoch [69/200]  Total Loss: 5771.058  Reconstruction Loss: 2315.542  KL Divergence Loss: 6911.031
+Epoch [70/200]  Total Loss: 5740.915  Reconstruction Loss: 2295.515  KL Divergence Loss: 6890.800
+Epoch [71/200]  Total Loss: 5766.393  Reconstruction Loss: 2318.728  KL Divergence Loss: 6895.330
+Epoch [72/200]  Total Loss: 5738.136  Reconstruction Loss: 2286.881  KL Divergence Loss: 6902.510
+Epoch [73/200]  Total Loss: 5733.805  Reconstruction Loss: 2289.345  KL Divergence Loss: 6888.920
+Epoch [74/200]  Total Loss: 5735.166  Reconstruction Loss: 2295.210  KL Divergence Loss: 6879.913
+Epoch [75/200]  Total Loss: 5750.743  Reconstruction Loss: 2304.124  KL Divergence Loss: 6893.237
+Epoch [76/200]  Total Loss: 5711.474  Reconstruction Loss: 2277.627  KL Divergence Loss: 6867.694
+Epoch [77/200]  Total Loss: 5733.267  Reconstruction Loss: 2296.337  KL Divergence Loss: 6873.859
+Epoch [78/200]  Total Loss: 5702.762  Reconstruction Loss: 2258.963  KL Divergence Loss: 6887.598
+Epoch [79/200]  Total Loss: 5688.782  Reconstruction Loss: 2259.800  KL Divergence Loss: 6857.963
+Epoch [80/200]  Total Loss: 5700.897  Reconstruction Loss: 2265.685  KL Divergence Loss: 6870.423
+Epoch [81/200]  Total Loss: 5689.857  Reconstruction Loss: 2259.392  KL Divergence Loss: 6860.929
+Epoch [82/200]  Total Loss: 5705.974  Reconstruction Loss: 2271.191  KL Divergence Loss: 6869.565
+Epoch [83/200]  Total Loss: 5687.232  Reconstruction Loss: 2252.459  KL Divergence Loss: 6869.547
+Epoch [84/200]  Total Loss: 5690.509  Reconstruction Loss: 2261.828  KL Divergence Loss: 6857.362
+Epoch [85/200]  Total Loss: 5667.215  Reconstruction Loss: 2243.957  KL Divergence Loss: 6846.516
+Epoch [86/200]  Total Loss: 5662.810  Reconstruction Loss: 2237.395  KL Divergence Loss: 6850.830
+Epoch [87/200]  Total Loss: 5665.239  Reconstruction Loss: 2238.558  KL Divergence Loss: 6853.362
+Epoch [88/200]  Total Loss: 5650.749  Reconstruction Loss: 2228.752  KL Divergence Loss: 6843.993
+Epoch [89/200]  Total Loss: 5669.235  Reconstruction Loss: 2243.479  KL Divergence Loss: 6851.513
+Epoch [90/200]  Total Loss: 5643.818  Reconstruction Loss: 2222.562  KL Divergence Loss: 6842.512
+Epoch [91/200]  Total Loss: 5641.380  Reconstruction Loss: 2226.841  KL Divergence Loss: 6829.077
+Epoch [92/200]  Total Loss: 5645.725  Reconstruction Loss: 2229.052  KL Divergence Loss: 6833.345
+Epoch [93/200]  Total Loss: 5632.869  Reconstruction Loss: 2216.464  KL Divergence Loss: 6832.810
+Epoch [94/200]  Total Loss: 5622.148  Reconstruction Loss: 2208.035  KL Divergence Loss: 6828.226
+Epoch [95/200]  Total Loss: 5633.313  Reconstruction Loss: 2220.665  KL Divergence Loss: 6825.296
+Epoch [96/200]  Total Loss: 5621.884  Reconstruction Loss: 2208.915  KL Divergence Loss: 6825.939
+Epoch [97/200]  Total Loss: 5620.822  Reconstruction Loss: 2210.965  KL Divergence Loss: 6819.713
+Epoch [98/200]  Total Loss: 5616.696  Reconstruction Loss: 2205.144  KL Divergence Loss: 6823.104
+Epoch [99/200]  Total Loss: 5609.070  Reconstruction Loss: 2202.293  KL Divergence Loss: 6813.554
+Epoch [100/200]  Total Loss: 5624.063  Reconstruction Loss: 2218.964  KL Divergence Loss: 6810.200
+Epoch [101/200]  Total Loss: 5624.955  Reconstruction Loss: 2222.479  KL Divergence Loss: 6804.953
+Epoch [102/200]  Total Loss: 5600.192  Reconstruction Loss: 2192.957  KL Divergence Loss: 6814.470
+Epoch [103/200]  Total Loss: 5591.084  Reconstruction Loss: 2192.987  KL Divergence Loss: 6796.195
+Epoch [104/200]  Total Loss: 5588.108  Reconstruction Loss: 2189.073  KL Divergence Loss: 6798.071
+Epoch [105/200]  Total Loss: 5574.164  Reconstruction Loss: 2176.716  KL Divergence Loss: 6794.898
+Epoch [106/200]  Total Loss: 5595.880  Reconstruction Loss: 2198.224  KL Divergence Loss: 6795.311
+Epoch [107/200]  Total Loss: 5577.452  Reconstruction Loss: 2177.196  KL Divergence Loss: 6800.512
+Epoch [108/200]  Total Loss: 5574.228  Reconstruction Loss: 2180.570  KL Divergence Loss: 6787.316
+Epoch [109/200]  Total Loss: 5583.760  Reconstruction Loss: 2189.097  KL Divergence Loss: 6789.326
+Epoch [110/200]  Total Loss: 5572.067  Reconstruction Loss: 2177.522  KL Divergence Loss: 6789.091
+Epoch [111/200]  Total Loss: 5566.740  Reconstruction Loss: 2178.623  KL Divergence Loss: 6776.233
+Epoch [112/200]  Total Loss: 5559.849  Reconstruction Loss: 2169.841  KL Divergence Loss: 6780.017
+Epoch [113/200]  Total Loss: 5567.266  Reconstruction Loss: 2177.404  KL Divergence Loss: 6779.725
+Epoch [114/200]  Total Loss: 5559.536  Reconstruction Loss: 2175.529  KL Divergence Loss: 6768.015
+Epoch [115/200]  Total Loss: 5561.491  Reconstruction Loss: 2177.855  KL Divergence Loss: 6767.271
+Epoch [116/200]  Total Loss: 5548.878  Reconstruction Loss: 2159.918  KL Divergence Loss: 6777.919
+Epoch [117/200]  Total Loss: 5552.185  Reconstruction Loss: 2167.187  KL Divergence Loss: 6769.995
+Epoch [118/200]  Total Loss: 5555.582  Reconstruction Loss: 2174.276  KL Divergence Loss: 6762.612
+Epoch [119/200]  Total Loss: 5553.505  Reconstruction Loss: 2169.296  KL Divergence Loss: 6768.419
+Epoch [120/200]  Total Loss: 5552.731  Reconstruction Loss: 2169.386  KL Divergence Loss: 6766.689
+Epoch [121/200]  Total Loss: 5532.712  Reconstruction Loss: 2149.819  KL Divergence Loss: 6765.785
+Epoch [122/200]  Total Loss: 5533.372  Reconstruction Loss: 2158.299  KL Divergence Loss: 6750.147
+Epoch [123/200]  Total Loss: 5513.723  Reconstruction Loss: 2138.605  KL Divergence Loss: 6750.236
+Epoch [124/200]  Total Loss: 5541.258  Reconstruction Loss: 2164.490  KL Divergence Loss: 6753.535
+Epoch [125/200]  Total Loss: 5526.501  Reconstruction Loss: 2150.032  KL Divergence Loss: 6752.937
+Epoch [126/200]  Total Loss: 5514.944  Reconstruction Loss: 2143.292  KL Divergence Loss: 6743.303
+Epoch [127/200]  Total Loss: 5541.184  Reconstruction Loss: 2160.769  KL Divergence Loss: 6760.831
+Epoch [128/200]  Total Loss: 5521.618  Reconstruction Loss: 2149.056  KL Divergence Loss: 6745.124
+Epoch [129/200]  Total Loss: 5515.478  Reconstruction Loss: 2140.447  KL Divergence Loss: 6750.061
+Epoch [130/200]  Total Loss: 5506.710  Reconstruction Loss: 2138.834  KL Divergence Loss: 6735.753
+Epoch [131/200]  Total Loss: 5529.308  Reconstruction Loss: 2156.258  KL Divergence Loss: 6746.099
+Epoch [132/200]  Total Loss: 5517.759  Reconstruction Loss: 2150.548  KL Divergence Loss: 6734.421
+Epoch [133/200]  Total Loss: 5495.246  Reconstruction Loss: 2129.829  KL Divergence Loss: 6730.835
+Epoch [134/200]  Total Loss: 5505.605  Reconstruction Loss: 2138.830  KL Divergence Loss: 6733.548
+Epoch [135/200]  Total Loss: 5494.343  Reconstruction Loss: 2128.453  KL Divergence Loss: 6731.781
+Epoch [136/200]  Total Loss: 5512.284  Reconstruction Loss: 2148.216  KL Divergence Loss: 6728.135
+Epoch [137/200]  Total Loss: 5490.410  Reconstruction Loss: 2124.515  KL Divergence Loss: 6731.790
+Epoch [138/200]  Total Loss: 5488.151  Reconstruction Loss: 2121.417  KL Divergence Loss: 6733.466
+Epoch [139/200]  Total Loss: 5498.921  Reconstruction Loss: 2139.815  KL Divergence Loss: 6718.212
+Epoch [140/200]  Total Loss: 5477.279  Reconstruction Loss: 2116.924  KL Divergence Loss: 6720.710
+Epoch [141/200]  Total Loss: 5478.229  Reconstruction Loss: 2117.414  KL Divergence Loss: 6721.628
+Epoch [142/200]  Total Loss: 5476.120  Reconstruction Loss: 2124.702  KL Divergence Loss: 6702.836
+Epoch [143/200]  Total Loss: 5495.344  Reconstruction Loss: 2139.284  KL Divergence Loss: 6712.121
+Epoch [144/200]  Total Loss: 5480.138  Reconstruction Loss: 2130.523  KL Divergence Loss: 6699.230
+Epoch [145/200]  Total Loss: 5465.200  Reconstruction Loss: 2109.130  KL Divergence Loss: 6712.140
+Epoch [146/200]  Total Loss: 5477.458  Reconstruction Loss: 2122.226  KL Divergence Loss: 6710.464
+Epoch [147/200]  Total Loss: 5483.419  Reconstruction Loss: 2134.185  KL Divergence Loss: 6698.469
+Epoch [148/200]  Total Loss: 5465.831  Reconstruction Loss: 2117.626  KL Divergence Loss: 6696.411
+Epoch [149/200]  Total Loss: 5457.262  Reconstruction Loss: 2103.841  KL Divergence Loss: 6706.841
+Epoch [150/200]  Total Loss: 5469.507  Reconstruction Loss: 2122.746  KL Divergence Loss: 6693.522
+Epoch [151/200]  Total Loss: 5471.885  Reconstruction Loss: 2121.630  KL Divergence Loss: 6700.509
+Epoch [152/200]  Total Loss: 5459.557  Reconstruction Loss: 2108.202  KL Divergence Loss: 6702.711
+Epoch [153/200]  Total Loss: 5477.376  Reconstruction Loss: 2128.349  KL Divergence Loss: 6698.053
+Epoch [154/200]  Total Loss: 5454.322  Reconstruction Loss: 2104.781  KL Divergence Loss: 6699.081
+Epoch [155/200]  Total Loss: 5453.816  Reconstruction Loss: 2107.160  KL Divergence Loss: 6693.312
+Epoch [156/200]  Total Loss: 5446.687  Reconstruction Loss: 2103.466  KL Divergence Loss: 6686.443
+Epoch [157/200]  Total Loss: 5455.881  Reconstruction Loss: 2109.854  KL Divergence Loss: 6692.054
+Epoch [158/200]  Total Loss: 5439.537  Reconstruction Loss: 2093.179  KL Divergence Loss: 6692.716
+Epoch [159/200]  Total Loss: 5444.703  Reconstruction Loss: 2102.324  KL Divergence Loss: 6684.757
+Epoch [160/200]  Total Loss: 5446.352  Reconstruction Loss: 2109.737  KL Divergence Loss: 6673.230
+Epoch [161/200]  Total Loss: 5423.063  Reconstruction Loss: 2085.051  KL Divergence Loss: 6676.024
+Epoch [162/200]  Total Loss: 5424.749  Reconstruction Loss: 2089.650  KL Divergence Loss: 6670.198
+Epoch [163/200]  Total Loss: 5432.160  Reconstruction Loss: 2096.689  KL Divergence Loss: 6670.942
+Epoch [164/200]  Total Loss: 5444.130  Reconstruction Loss: 2108.337  KL Divergence Loss: 6671.585
+Epoch [165/200]  Total Loss: 5428.701  Reconstruction Loss: 2092.408  KL Divergence Loss: 6672.587
+Epoch [166/200]  Total Loss: 5445.980  Reconstruction Loss: 2109.534  KL Divergence Loss: 6672.892
+Epoch [167/200]  Total Loss: 5430.395  Reconstruction Loss: 2096.268  KL Divergence Loss: 6668.255
+Epoch [168/200]  Total Loss: 5421.683  Reconstruction Loss: 2087.313  KL Divergence Loss: 6668.739
+Epoch [169/200]  Total Loss: 5412.483  Reconstruction Loss: 2080.121  KL Divergence Loss: 6664.724
+Epoch [170/200]  Total Loss: 5421.022  Reconstruction Loss: 2086.328  KL Divergence Loss: 6669.388
+Epoch [171/200]  Total Loss: 5425.130  Reconstruction Loss: 2095.898  KL Divergence Loss: 6658.465
+Epoch [172/200]  Total Loss: 5423.546  Reconstruction Loss: 2092.815  KL Divergence Loss: 6661.462
+Epoch [173/200]  Total Loss: 5423.430  Reconstruction Loss: 2090.904  KL Divergence Loss: 6665.053
+Epoch [174/200]  Total Loss: 5399.130  Reconstruction Loss: 2073.015  KL Divergence Loss: 6652.230
+Epoch [175/200]  Total Loss: 5393.691  Reconstruction Loss: 2070.790  KL Divergence Loss: 6645.801
+Epoch [176/200]  Total Loss: 5401.414  Reconstruction Loss: 2079.295  KL Divergence Loss: 6644.237
+Epoch [177/200]  Total Loss: 5413.116  Reconstruction Loss: 2086.858  KL Divergence Loss: 6652.517
+Epoch [178/200]  Total Loss: 5393.696  Reconstruction Loss: 2074.117  KL Divergence Loss: 6639.158
+Epoch [179/200]  Total Loss: 5418.700  Reconstruction Loss: 2094.196  KL Divergence Loss: 6649.008
+Epoch [180/200]  Total Loss: 5414.151  Reconstruction Loss: 2094.227  KL Divergence Loss: 6639.848
+Epoch [181/200]  Total Loss: 5388.770  Reconstruction Loss: 2071.486  KL Divergence Loss: 6634.567
+Epoch [182/200]  Total Loss: 5396.380  Reconstruction Loss: 2073.247  KL Divergence Loss: 6646.266
+Epoch [183/200]  Total Loss: 5396.406  Reconstruction Loss: 2082.815  KL Divergence Loss: 6627.181
+Epoch [184/200]  Total Loss: 5396.351  Reconstruction Loss: 2081.254  KL Divergence Loss: 6630.193
+Epoch [185/200]  Total Loss: 5395.627  Reconstruction Loss: 2078.316  KL Divergence Loss: 6634.622
+Epoch [186/200]  Total Loss: 5381.153  Reconstruction Loss: 2061.639  KL Divergence Loss: 6639.029
+Epoch [187/200]  Total Loss: 5386.037  Reconstruction Loss: 2071.085  KL Divergence Loss: 6629.903
+Epoch [188/200]  Total Loss: 5389.716  Reconstruction Loss: 2072.839  KL Divergence Loss: 6633.753
+Epoch [189/200]  Total Loss: 5390.708  Reconstruction Loss: 2069.387  KL Divergence Loss: 6642.642
+Epoch [190/200]  Total Loss: 5378.615  Reconstruction Loss: 2066.419  KL Divergence Loss: 6624.393
+Epoch [191/200]  Total Loss: 5375.592  Reconstruction Loss: 2060.624  KL Divergence Loss: 6629.936
+Epoch [192/200]  Total Loss: 5363.777  Reconstruction Loss: 2051.498  KL Divergence Loss: 6624.557
+Epoch [193/200]  Total Loss: 5376.551  Reconstruction Loss: 2062.568  KL Divergence Loss: 6627.967
+Epoch [194/200]  Total Loss: 5387.730  Reconstruction Loss: 2081.281  KL Divergence Loss: 6612.897
+Epoch [195/200]  Total Loss: 5370.232  Reconstruction Loss: 2060.659  KL Divergence Loss: 6619.146
+Epoch [196/200]  Total Loss: 5371.765  Reconstruction Loss: 2063.163  KL Divergence Loss: 6617.203
+Epoch [197/200]  Total Loss: 5371.777  Reconstruction Loss: 2068.829  KL Divergence Loss: 6605.896
+Epoch [198/200]  Total Loss: 5368.064  Reconstruction Loss: 2059.419  KL Divergence Loss: 6617.290
+Epoch [199/200]  Total Loss: 5364.479  Reconstruction Loss: 2054.216  KL Divergence Loss: 6620.527
+Epoch [200/200]  Total Loss: 5365.470  Reconstruction Loss: 2060.559  KL Divergence Loss: 6609.822
+Saved best checkpoint (loss=5363.777) to checkpoints/vae_best_20260810_120642.pt
+Saved final checkpoint to checkpoints/vae_final_epoch200_20260810_120642.pt
+Saved training loss plot to training_plots/vae_training_loss_20260810_121500.png
+Saved generated samples plot to visuals/vae_generated_20260810_121501.png
+Saved reconstruction plot to visuals/vae_reconstructed_20260810_121501.png
+
+
+python finetune.py --trained-vae-filename vae_best_20260810_120642.pt
+Loaded VAE checkpoint from checkpoints/vae_best_20260810_120642.pt (epoch=192, loss=5363.776740105597)
+Epoch [1/200]  Generator Loss: 2134.022  Reconstruction Loss: 2099.060  Generator Adversarial Loss: 0.699  Discriminator Loss: 1.380
+Epoch [2/200]  Generator Loss: 2130.031  Reconstruction Loss: 2091.861  Generator Adversarial Loss: 0.763  Discriminator Loss: 1.317
+Epoch [3/200]  Generator Loss: 2147.944  Reconstruction Loss: 2101.229  Generator Adversarial Loss: 0.934  Discriminator Loss: 1.153
+Epoch [4/200]  Generator Loss: 2167.939  Reconstruction Loss: 2114.901  Generator Adversarial Loss: 1.061  Discriminator Loss: 1.067
+Epoch [5/200]  Generator Loss: 2146.991  Reconstruction Loss: 2090.290  Generator Adversarial Loss: 1.134  Discriminator Loss: 1.018
+Epoch [6/200]  Generator Loss: 2156.463  Reconstruction Loss: 2097.837  Generator Adversarial Loss: 1.173  Discriminator Loss: 0.995
+Epoch [7/200]  Generator Loss: 2165.506  Reconstruction Loss: 2107.183  Generator Adversarial Loss: 1.166  Discriminator Loss: 1.005
+Epoch [8/200]  Generator Loss: 2138.577  Reconstruction Loss: 2081.176  Generator Adversarial Loss: 1.148  Discriminator Loss: 1.017
+Epoch [9/200]  Generator Loss: 2163.987  Reconstruction Loss: 2107.693  Generator Adversarial Loss: 1.126  Discriminator Loss: 1.034
+Epoch [10/200]  Generator Loss: 2131.232  Reconstruction Loss: 2075.798  Generator Adversarial Loss: 1.109  Discriminator Loss: 1.047
+Epoch [11/200]  Generator Loss: 2154.256  Reconstruction Loss: 2099.108  Generator Adversarial Loss: 1.103  Discriminator Loss: 1.059
+Epoch [12/200]  Generator Loss: 2142.933  Reconstruction Loss: 2088.401  Generator Adversarial Loss: 1.091  Discriminator Loss: 1.056
+Epoch [13/200]  Generator Loss: 2151.175  Reconstruction Loss: 2097.051  Generator Adversarial Loss: 1.082  Discriminator Loss: 1.064
+Epoch [14/200]  Generator Loss: 2154.615  Reconstruction Loss: 2100.297  Generator Adversarial Loss: 1.086  Discriminator Loss: 1.060
+Epoch [15/200]  Generator Loss: 2139.968  Reconstruction Loss: 2085.481  Generator Adversarial Loss: 1.090  Discriminator Loss: 1.055
+Epoch [16/200]  Generator Loss: 2163.779  Reconstruction Loss: 2108.840  Generator Adversarial Loss: 1.099  Discriminator Loss: 1.050
+Epoch [17/200]  Generator Loss: 2145.670  Reconstruction Loss: 2090.406  Generator Adversarial Loss: 1.105  Discriminator Loss: 1.051
+Epoch [18/200]  Generator Loss: 2156.238  Reconstruction Loss: 2101.344  Generator Adversarial Loss: 1.098  Discriminator Loss: 1.053
+Epoch [19/200]  Generator Loss: 2161.392  Reconstruction Loss: 2106.063  Generator Adversarial Loss: 1.107  Discriminator Loss: 1.047
+Epoch [20/200]  Generator Loss: 2140.210  Reconstruction Loss: 2084.511  Generator Adversarial Loss: 1.114  Discriminator Loss: 1.044
+Epoch [21/200]  Generator Loss: 2148.866  Reconstruction Loss: 2093.042  Generator Adversarial Loss: 1.116  Discriminator Loss: 1.047
+Epoch [22/200]  Generator Loss: 2161.115  Reconstruction Loss: 2105.281  Generator Adversarial Loss: 1.117  Discriminator Loss: 1.039
+Epoch [23/200]  Generator Loss: 2145.369  Reconstruction Loss: 2089.346  Generator Adversarial Loss: 1.120  Discriminator Loss: 1.041
+Epoch [24/200]  Generator Loss: 2145.942  Reconstruction Loss: 2089.884  Generator Adversarial Loss: 1.121  Discriminator Loss: 1.043
+Epoch [25/200]  Generator Loss: 2151.783  Reconstruction Loss: 2095.627  Generator Adversarial Loss: 1.123  Discriminator Loss: 1.039
+Epoch [26/200]  Generator Loss: 2141.779  Reconstruction Loss: 2085.378  Generator Adversarial Loss: 1.128  Discriminator Loss: 1.030
+Epoch [27/200]  Generator Loss: 2136.559  Reconstruction Loss: 2079.839  Generator Adversarial Loss: 1.134  Discriminator Loss: 1.032
+Epoch [28/200]  Generator Loss: 2151.480  Reconstruction Loss: 2094.707  Generator Adversarial Loss: 1.135  Discriminator Loss: 1.030
+Epoch [29/200]  Generator Loss: 2129.347  Reconstruction Loss: 2072.064  Generator Adversarial Loss: 1.146  Discriminator Loss: 1.023
+Epoch [30/200]  Generator Loss: 2157.265  Reconstruction Loss: 2099.778  Generator Adversarial Loss: 1.150  Discriminator Loss: 1.017
+Epoch [31/200]  Generator Loss: 2150.336  Reconstruction Loss: 2092.604  Generator Adversarial Loss: 1.155  Discriminator Loss: 1.020
+Epoch [32/200]  Generator Loss: 2144.040  Reconstruction Loss: 2085.931  Generator Adversarial Loss: 1.162  Discriminator Loss: 1.009
+Epoch [33/200]  Generator Loss: 2134.486  Reconstruction Loss: 2075.664  Generator Adversarial Loss: 1.176  Discriminator Loss: 1.005
+Epoch [34/200]  Generator Loss: 2143.732  Reconstruction Loss: 2085.131  Generator Adversarial Loss: 1.172  Discriminator Loss: 1.008
+Epoch [35/200]  Generator Loss: 2144.088  Reconstruction Loss: 2085.084  Generator Adversarial Loss: 1.180  Discriminator Loss: 0.999
+Epoch [36/200]  Generator Loss: 2149.611  Reconstruction Loss: 2090.217  Generator Adversarial Loss: 1.188  Discriminator Loss: 0.990
+Epoch [37/200]  Generator Loss: 2147.571  Reconstruction Loss: 2087.727  Generator Adversarial Loss: 1.197  Discriminator Loss: 0.989
+Epoch [38/200]  Generator Loss: 2125.124  Reconstruction Loss: 2065.186  Generator Adversarial Loss: 1.199  Discriminator Loss: 0.983
+Epoch [39/200]  Generator Loss: 2140.701  Reconstruction Loss: 2080.386  Generator Adversarial Loss: 1.206  Discriminator Loss: 0.982
+Epoch [40/200]  Generator Loss: 2138.451  Reconstruction Loss: 2077.693  Generator Adversarial Loss: 1.215  Discriminator Loss: 0.977
+Epoch [41/200]  Generator Loss: 2135.177  Reconstruction Loss: 2074.290  Generator Adversarial Loss: 1.218  Discriminator Loss: 0.976
+Epoch [42/200]  Generator Loss: 2154.982  Reconstruction Loss: 2093.510  Generator Adversarial Loss: 1.229  Discriminator Loss: 0.969
+Epoch [43/200]  Generator Loss: 2136.227  Reconstruction Loss: 2074.567  Generator Adversarial Loss: 1.233  Discriminator Loss: 0.966
+Epoch [44/200]  Generator Loss: 2138.337  Reconstruction Loss: 2076.603  Generator Adversarial Loss: 1.235  Discriminator Loss: 0.963
+Epoch [45/200]  Generator Loss: 2131.658  Reconstruction Loss: 2069.565  Generator Adversarial Loss: 1.242  Discriminator Loss: 0.960
+Epoch [46/200]  Generator Loss: 2151.674  Reconstruction Loss: 2089.113  Generator Adversarial Loss: 1.251  Discriminator Loss: 0.963
+Epoch [47/200]  Generator Loss: 2130.135  Reconstruction Loss: 2068.037  Generator Adversarial Loss: 1.242  Discriminator Loss: 0.959
+Epoch [48/200]  Generator Loss: 2149.650  Reconstruction Loss: 2086.623  Generator Adversarial Loss: 1.261  Discriminator Loss: 0.949
+Epoch [49/200]  Generator Loss: 2136.925  Reconstruction Loss: 2073.599  Generator Adversarial Loss: 1.267  Discriminator Loss: 0.950
+Epoch [50/200]  Generator Loss: 2148.168  Reconstruction Loss: 2085.430  Generator Adversarial Loss: 1.255  Discriminator Loss: 0.949
+Epoch [51/200]  Generator Loss: 2141.987  Reconstruction Loss: 2078.531  Generator Adversarial Loss: 1.269  Discriminator Loss: 0.944
+Epoch [52/200]  Generator Loss: 2150.560  Reconstruction Loss: 2087.229  Generator Adversarial Loss: 1.267  Discriminator Loss: 0.951
+Epoch [53/200]  Generator Loss: 2148.826  Reconstruction Loss: 2085.084  Generator Adversarial Loss: 1.275  Discriminator Loss: 0.946
+Epoch [54/200]  Generator Loss: 2134.481  Reconstruction Loss: 2070.747  Generator Adversarial Loss: 1.275  Discriminator Loss: 0.952
+Epoch [55/200]  Generator Loss: 2145.782  Reconstruction Loss: 2082.125  Generator Adversarial Loss: 1.273  Discriminator Loss: 0.942
+Epoch [56/200]  Generator Loss: 2144.585  Reconstruction Loss: 2080.933  Generator Adversarial Loss: 1.273  Discriminator Loss: 0.947
+Epoch [57/200]  Generator Loss: 2133.418  Reconstruction Loss: 2069.461  Generator Adversarial Loss: 1.279  Discriminator Loss: 0.947
+Epoch [58/200]  Generator Loss: 2145.914  Reconstruction Loss: 2082.106  Generator Adversarial Loss: 1.276  Discriminator Loss: 0.945
+Epoch [59/200]  Generator Loss: 2130.897  Reconstruction Loss: 2066.906  Generator Adversarial Loss: 1.280  Discriminator Loss: 0.947
+Epoch [60/200]  Generator Loss: 2153.405  Reconstruction Loss: 2089.327  Generator Adversarial Loss: 1.282  Discriminator Loss: 0.942
+Epoch [61/200]  Generator Loss: 2140.946  Reconstruction Loss: 2077.228  Generator Adversarial Loss: 1.274  Discriminator Loss: 0.946
+Epoch [62/200]  Generator Loss: 2135.171  Reconstruction Loss: 2071.310  Generator Adversarial Loss: 1.277  Discriminator Loss: 0.947
+Epoch [63/200]  Generator Loss: 2151.852  Reconstruction Loss: 2088.144  Generator Adversarial Loss: 1.274  Discriminator Loss: 0.946
+Epoch [64/200]  Generator Loss: 2141.782  Reconstruction Loss: 2077.632  Generator Adversarial Loss: 1.283  Discriminator Loss: 0.937
+Epoch [65/200]  Generator Loss: 2115.837  Reconstruction Loss: 2051.689  Generator Adversarial Loss: 1.283  Discriminator Loss: 0.940
+Epoch [66/200]  Generator Loss: 2144.396  Reconstruction Loss: 2079.596  Generator Adversarial Loss: 1.296  Discriminator Loss: 0.937
+Epoch [67/200]  Generator Loss: 2128.215  Reconstruction Loss: 2063.793  Generator Adversarial Loss: 1.288  Discriminator Loss: 0.939
+Epoch [68/200]  Generator Loss: 2144.641  Reconstruction Loss: 2079.757  Generator Adversarial Loss: 1.298  Discriminator Loss: 0.936
+Epoch [69/200]  Generator Loss: 2142.364  Reconstruction Loss: 2077.127  Generator Adversarial Loss: 1.305  Discriminator Loss: 0.926
+Epoch [70/200]  Generator Loss: 2147.575  Reconstruction Loss: 2082.539  Generator Adversarial Loss: 1.301  Discriminator Loss: 0.925
+Epoch [71/200]  Generator Loss: 2163.661  Reconstruction Loss: 2097.739  Generator Adversarial Loss: 1.318  Discriminator Loss: 0.920
+Epoch [72/200]  Generator Loss: 2128.450  Reconstruction Loss: 2062.716  Generator Adversarial Loss: 1.315  Discriminator Loss: 0.914
+Epoch [73/200]  Generator Loss: 2139.445  Reconstruction Loss: 2073.568  Generator Adversarial Loss: 1.318  Discriminator Loss: 0.922
+Epoch [74/200]  Generator Loss: 2138.711  Reconstruction Loss: 2072.494  Generator Adversarial Loss: 1.324  Discriminator Loss: 0.913
+Epoch [75/200]  Generator Loss: 2145.221  Reconstruction Loss: 2078.721  Generator Adversarial Loss: 1.330  Discriminator Loss: 0.911
+Epoch [76/200]  Generator Loss: 2140.130  Reconstruction Loss: 2073.482  Generator Adversarial Loss: 1.333  Discriminator Loss: 0.910
+Epoch [77/200]  Generator Loss: 2140.190  Reconstruction Loss: 2073.248  Generator Adversarial Loss: 1.339  Discriminator Loss: 0.903
+Epoch [78/200]  Generator Loss: 2136.368  Reconstruction Loss: 2069.568  Generator Adversarial Loss: 1.336  Discriminator Loss: 0.911
+Epoch [79/200]  Generator Loss: 2142.406  Reconstruction Loss: 2075.066  Generator Adversarial Loss: 1.347  Discriminator Loss: 0.895
+Epoch [80/200]  Generator Loss: 2144.065  Reconstruction Loss: 2076.203  Generator Adversarial Loss: 1.357  Discriminator Loss: 0.895
+Epoch [81/200]  Generator Loss: 2143.767  Reconstruction Loss: 2076.124  Generator Adversarial Loss: 1.353  Discriminator Loss: 0.902
+Epoch [82/200]  Generator Loss: 2140.533  Reconstruction Loss: 2072.797  Generator Adversarial Loss: 1.355  Discriminator Loss: 0.895
+Epoch [83/200]  Generator Loss: 2136.471  Reconstruction Loss: 2068.808  Generator Adversarial Loss: 1.353  Discriminator Loss: 0.899
+Epoch [84/200]  Generator Loss: 2139.225  Reconstruction Loss: 2071.229  Generator Adversarial Loss: 1.360  Discriminator Loss: 0.896
+Epoch [85/200]  Generator Loss: 2132.983  Reconstruction Loss: 2064.876  Generator Adversarial Loss: 1.362  Discriminator Loss: 0.893
+Epoch [86/200]  Generator Loss: 2142.023  Reconstruction Loss: 2073.664  Generator Adversarial Loss: 1.367  Discriminator Loss: 0.884
+Epoch [87/200]  Generator Loss: 2151.703  Reconstruction Loss: 2082.776  Generator Adversarial Loss: 1.379  Discriminator Loss: 0.889
+Epoch [88/200]  Generator Loss: 2131.496  Reconstruction Loss: 2063.762  Generator Adversarial Loss: 1.355  Discriminator Loss: 0.888
+Epoch [89/200]  Generator Loss: 2152.592  Reconstruction Loss: 2083.443  Generator Adversarial Loss: 1.383  Discriminator Loss: 0.893
+Epoch [90/200]  Generator Loss: 2131.552  Reconstruction Loss: 2062.601  Generator Adversarial Loss: 1.379  Discriminator Loss: 0.884
+Epoch [91/200]  Generator Loss: 2133.792  Reconstruction Loss: 2064.899  Generator Adversarial Loss: 1.378  Discriminator Loss: 0.882
+Epoch [92/200]  Generator Loss: 2145.268  Reconstruction Loss: 2075.812  Generator Adversarial Loss: 1.389  Discriminator Loss: 0.887
+Epoch [93/200]  Generator Loss: 2137.574  Reconstruction Loss: 2068.307  Generator Adversarial Loss: 1.385  Discriminator Loss: 0.876
+Epoch [94/200]  Generator Loss: 2139.203  Reconstruction Loss: 2069.312  Generator Adversarial Loss: 1.398  Discriminator Loss: 0.882
+Epoch [95/200]  Generator Loss: 2137.761  Reconstruction Loss: 2067.838  Generator Adversarial Loss: 1.398  Discriminator Loss: 0.872
+Epoch [96/200]  Generator Loss: 2131.858  Reconstruction Loss: 2061.654  Generator Adversarial Loss: 1.404  Discriminator Loss: 0.882
+Epoch [97/200]  Generator Loss: 2136.845  Reconstruction Loss: 2066.585  Generator Adversarial Loss: 1.405  Discriminator Loss: 0.868
+Epoch [98/200]  Generator Loss: 2132.764  Reconstruction Loss: 2062.421  Generator Adversarial Loss: 1.407  Discriminator Loss: 0.867
+Epoch [99/200]  Generator Loss: 2137.451  Reconstruction Loss: 2066.278  Generator Adversarial Loss: 1.423  Discriminator Loss: 0.868
+Epoch [100/200]  Generator Loss: 2147.298  Reconstruction Loss: 2076.534  Generator Adversarial Loss: 1.415  Discriminator Loss: 0.872
+Epoch [101/200]  Generator Loss: 2137.712  Reconstruction Loss: 2067.190  Generator Adversarial Loss: 1.410  Discriminator Loss: 0.867
+Epoch [102/200]  Generator Loss: 2137.546  Reconstruction Loss: 2066.690  Generator Adversarial Loss: 1.417  Discriminator Loss: 0.861
+Epoch [103/200]  Generator Loss: 2127.660  Reconstruction Loss: 2056.213  Generator Adversarial Loss: 1.429  Discriminator Loss: 0.866
+Epoch [104/200]  Generator Loss: 2127.665  Reconstruction Loss: 2055.986  Generator Adversarial Loss: 1.434  Discriminator Loss: 0.859
+Epoch [105/200]  Generator Loss: 2121.958  Reconstruction Loss: 2050.513  Generator Adversarial Loss: 1.429  Discriminator Loss: 0.863
+Epoch [106/200]  Generator Loss: 2151.204  Reconstruction Loss: 2079.548  Generator Adversarial Loss: 1.433  Discriminator Loss: 0.862
+Epoch [107/200]  Generator Loss: 2126.106  Reconstruction Loss: 2053.896  Generator Adversarial Loss: 1.444  Discriminator Loss: 0.855
+Epoch [108/200]  Generator Loss: 2138.642  Reconstruction Loss: 2066.204  Generator Adversarial Loss: 1.449  Discriminator Loss: 0.855
+Epoch [109/200]  Generator Loss: 2143.763  Reconstruction Loss: 2070.580  Generator Adversarial Loss: 1.464  Discriminator Loss: 0.849
+Epoch [110/200]  Generator Loss: 2125.664  Reconstruction Loss: 2053.101  Generator Adversarial Loss: 1.451  Discriminator Loss: 0.848
+Epoch [111/200]  Generator Loss: 2131.859  Reconstruction Loss: 2058.801  Generator Adversarial Loss: 1.461  Discriminator Loss: 0.842
+Epoch [112/200]  Generator Loss: 2137.591  Reconstruction Loss: 2064.099  Generator Adversarial Loss: 1.470  Discriminator Loss: 0.835
+Epoch [113/200]  Generator Loss: 2143.715  Reconstruction Loss: 2069.792  Generator Adversarial Loss: 1.478  Discriminator Loss: 0.837
+Epoch [114/200]  Generator Loss: 2124.941  Reconstruction Loss: 2050.950  Generator Adversarial Loss: 1.480  Discriminator Loss: 0.842
+Epoch [115/200]  Generator Loss: 2143.263  Reconstruction Loss: 2069.125  Generator Adversarial Loss: 1.483  Discriminator Loss: 0.838
+Epoch [116/200]  Generator Loss: 2130.741  Reconstruction Loss: 2056.673  Generator Adversarial Loss: 1.481  Discriminator Loss: 0.821
+Epoch [117/200]  Generator Loss: 2129.742  Reconstruction Loss: 2055.262  Generator Adversarial Loss: 1.490  Discriminator Loss: 0.834
+Epoch [118/200]  Generator Loss: 2139.109  Reconstruction Loss: 2063.810  Generator Adversarial Loss: 1.506  Discriminator Loss: 0.835
+Epoch [119/200]  Generator Loss: 2138.285  Reconstruction Loss: 2062.537  Generator Adversarial Loss: 1.515  Discriminator Loss: 0.823
+Epoch [120/200]  Generator Loss: 2147.706  Reconstruction Loss: 2072.242  Generator Adversarial Loss: 1.509  Discriminator Loss: 0.829
+Epoch [121/200]  Generator Loss: 2127.128  Reconstruction Loss: 2051.331  Generator Adversarial Loss: 1.516  Discriminator Loss: 0.828
+Epoch [122/200]  Generator Loss: 2147.339  Reconstruction Loss: 2071.716  Generator Adversarial Loss: 1.512  Discriminator Loss: 0.831
+Epoch [123/200]  Generator Loss: 2124.921  Reconstruction Loss: 2048.773  Generator Adversarial Loss: 1.523  Discriminator Loss: 0.826
+Epoch [124/200]  Generator Loss: 2154.985  Reconstruction Loss: 2078.845  Generator Adversarial Loss: 1.523  Discriminator Loss: 0.828
+Epoch [125/200]  Generator Loss: 2159.229  Reconstruction Loss: 2082.485  Generator Adversarial Loss: 1.535  Discriminator Loss: 0.816
+Epoch [126/200]  Generator Loss: 2120.672  Reconstruction Loss: 2044.010  Generator Adversarial Loss: 1.533  Discriminator Loss: 0.810
+Epoch [127/200]  Generator Loss: 2137.382  Reconstruction Loss: 2060.566  Generator Adversarial Loss: 1.536  Discriminator Loss: 0.810
+Epoch [128/200]  Generator Loss: 2139.585  Reconstruction Loss: 2063.200  Generator Adversarial Loss: 1.528  Discriminator Loss: 0.811
+Epoch [129/200]  Generator Loss: 2128.612  Reconstruction Loss: 2050.694  Generator Adversarial Loss: 1.558  Discriminator Loss: 0.820
+Epoch [130/200]  Generator Loss: 2132.345  Reconstruction Loss: 2055.023  Generator Adversarial Loss: 1.546  Discriminator Loss: 0.803
+Epoch [131/200]  Generator Loss: 2155.177  Reconstruction Loss: 2076.527  Generator Adversarial Loss: 1.573  Discriminator Loss: 0.810
+Epoch [132/200]  Generator Loss: 2147.887  Reconstruction Loss: 2069.679  Generator Adversarial Loss: 1.564  Discriminator Loss: 0.810
+Epoch [133/200]  Generator Loss: 2146.603  Reconstruction Loss: 2068.462  Generator Adversarial Loss: 1.563  Discriminator Loss: 0.813
+Epoch [134/200]  Generator Loss: 2135.950  Reconstruction Loss: 2057.478  Generator Adversarial Loss: 1.569  Discriminator Loss: 0.808
+Epoch [135/200]  Generator Loss: 2126.012  Reconstruction Loss: 2047.679  Generator Adversarial Loss: 1.567  Discriminator Loss: 0.806
+Epoch [136/200]  Generator Loss: 2159.919  Reconstruction Loss: 2081.860  Generator Adversarial Loss: 1.561  Discriminator Loss: 0.798
+Epoch [137/200]  Generator Loss: 2133.839  Reconstruction Loss: 2054.849  Generator Adversarial Loss: 1.580  Discriminator Loss: 0.788
+Epoch [138/200]  Generator Loss: 2132.374  Reconstruction Loss: 2053.714  Generator Adversarial Loss: 1.573  Discriminator Loss: 0.790
+Epoch [139/200]  Generator Loss: 2137.507  Reconstruction Loss: 2058.272  Generator Adversarial Loss: 1.585  Discriminator Loss: 0.798
+Epoch [140/200]  Generator Loss: 2127.656  Reconstruction Loss: 2048.289  Generator Adversarial Loss: 1.587  Discriminator Loss: 0.804
+Epoch [141/200]  Generator Loss: 2141.362  Reconstruction Loss: 2062.298  Generator Adversarial Loss: 1.581  Discriminator Loss: 0.793
+Epoch [142/200]  Generator Loss: 2144.842  Reconstruction Loss: 2065.801  Generator Adversarial Loss: 1.581  Discriminator Loss: 0.794
+Epoch [143/200]  Generator Loss: 2148.533  Reconstruction Loss: 2069.152  Generator Adversarial Loss: 1.588  Discriminator Loss: 0.793
+Epoch [144/200]  Generator Loss: 2157.981  Reconstruction Loss: 2078.415  Generator Adversarial Loss: 1.591  Discriminator Loss: 0.791
+Epoch [145/200]  Generator Loss: 2124.301  Reconstruction Loss: 2045.088  Generator Adversarial Loss: 1.584  Discriminator Loss: 0.792
+Epoch [146/200]  Generator Loss: 2154.937  Reconstruction Loss: 2075.461  Generator Adversarial Loss: 1.590  Discriminator Loss: 0.801
+Epoch [147/200]  Generator Loss: 2153.673  Reconstruction Loss: 2074.404  Generator Adversarial Loss: 1.585  Discriminator Loss: 0.783
+Epoch [148/200]  Generator Loss: 2138.606  Reconstruction Loss: 2059.601  Generator Adversarial Loss: 1.580  Discriminator Loss: 0.782
+Epoch [149/200]  Generator Loss: 2141.774  Reconstruction Loss: 2061.947  Generator Adversarial Loss: 1.597  Discriminator Loss: 0.790
+Epoch [150/200]  Generator Loss: 2155.368  Reconstruction Loss: 2074.641  Generator Adversarial Loss: 1.615  Discriminator Loss: 0.782
+Epoch [151/200]  Generator Loss: 2151.707  Reconstruction Loss: 2071.473  Generator Adversarial Loss: 1.605  Discriminator Loss: 0.795
+Epoch [152/200]  Generator Loss: 2139.837  Reconstruction Loss: 2059.453  Generator Adversarial Loss: 1.608  Discriminator Loss: 0.782
+Epoch [153/200]  Generator Loss: 2146.757  Reconstruction Loss: 2066.915  Generator Adversarial Loss: 1.597  Discriminator Loss: 0.787
+Epoch [154/200]  Generator Loss: 2135.843  Reconstruction Loss: 2055.820  Generator Adversarial Loss: 1.600  Discriminator Loss: 0.782
+Epoch [155/200]  Generator Loss: 2146.882  Reconstruction Loss: 2067.012  Generator Adversarial Loss: 1.597  Discriminator Loss: 0.798
+Epoch [156/200]  Generator Loss: 2136.772  Reconstruction Loss: 2056.388  Generator Adversarial Loss: 1.608  Discriminator Loss: 0.789
+Epoch [157/200]  Generator Loss: 2151.345  Reconstruction Loss: 2070.660  Generator Adversarial Loss: 1.614  Discriminator Loss: 0.776
+Epoch [158/200]  Generator Loss: 2131.363  Reconstruction Loss: 2050.957  Generator Adversarial Loss: 1.608  Discriminator Loss: 0.781
+Epoch [159/200]  Generator Loss: 2134.221  Reconstruction Loss: 2053.844  Generator Adversarial Loss: 1.608  Discriminator Loss: 0.777
+Epoch [160/200]  Generator Loss: 2140.971  Reconstruction Loss: 2060.545  Generator Adversarial Loss: 1.609  Discriminator Loss: 0.778
+Epoch [161/200]  Generator Loss: 2129.305  Reconstruction Loss: 2047.497  Generator Adversarial Loss: 1.636  Discriminator Loss: 0.789
+Epoch [162/200]  Generator Loss: 2130.898  Reconstruction Loss: 2049.808  Generator Adversarial Loss: 1.622  Discriminator Loss: 0.774
+Epoch [163/200]  Generator Loss: 2129.834  Reconstruction Loss: 2048.493  Generator Adversarial Loss: 1.627  Discriminator Loss: 0.782
+Epoch [164/200]  Generator Loss: 2150.770  Reconstruction Loss: 2069.615  Generator Adversarial Loss: 1.623  Discriminator Loss: 0.775
+Epoch [165/200]  Generator Loss: 2142.759  Reconstruction Loss: 2061.119  Generator Adversarial Loss: 1.633  Discriminator Loss: 0.776
+Epoch [166/200]  Generator Loss: 2157.092  Reconstruction Loss: 2075.766  Generator Adversarial Loss: 1.627  Discriminator Loss: 0.774
+Epoch [167/200]  Generator Loss: 2148.003  Reconstruction Loss: 2065.687  Generator Adversarial Loss: 1.646  Discriminator Loss: 0.773
+Epoch [168/200]  Generator Loss: 2137.242  Reconstruction Loss: 2054.964  Generator Adversarial Loss: 1.646  Discriminator Loss: 0.766
+Epoch [169/200]  Generator Loss: 2139.119  Reconstruction Loss: 2056.616  Generator Adversarial Loss: 1.650  Discriminator Loss: 0.771
+Epoch [170/200]  Generator Loss: 2136.530  Reconstruction Loss: 2053.197  Generator Adversarial Loss: 1.667  Discriminator Loss: 0.770
+Epoch [171/200]  Generator Loss: 2143.949  Reconstruction Loss: 2061.612  Generator Adversarial Loss: 1.647  Discriminator Loss: 0.774
+Epoch [172/200]  Generator Loss: 2143.205  Reconstruction Loss: 2059.615  Generator Adversarial Loss: 1.672  Discriminator Loss: 0.774
+Epoch [173/200]  Generator Loss: 2145.572  Reconstruction Loss: 2062.992  Generator Adversarial Loss: 1.652  Discriminator Loss: 0.764
+Epoch [174/200]  Generator Loss: 2140.009  Reconstruction Loss: 2056.615  Generator Adversarial Loss: 1.668  Discriminator Loss: 0.770
+Epoch [175/200]  Generator Loss: 2125.124  Reconstruction Loss: 2041.175  Generator Adversarial Loss: 1.679  Discriminator Loss: 0.767
+Epoch [176/200]  Generator Loss: 2128.653  Reconstruction Loss: 2044.296  Generator Adversarial Loss: 1.687  Discriminator Loss: 0.777
+Epoch [177/200]  Generator Loss: 2147.155  Reconstruction Loss: 2064.118  Generator Adversarial Loss: 1.661  Discriminator Loss: 0.762
+Epoch [178/200]  Generator Loss: 2129.345  Reconstruction Loss: 2045.144  Generator Adversarial Loss: 1.684  Discriminator Loss: 0.761
+Epoch [179/200]  Generator Loss: 2156.957  Reconstruction Loss: 2072.461  Generator Adversarial Loss: 1.690  Discriminator Loss: 0.765
+Epoch [180/200]  Generator Loss: 2136.408  Reconstruction Loss: 2052.010  Generator Adversarial Loss: 1.688  Discriminator Loss: 0.746
+Epoch [181/200]  Generator Loss: 2135.626  Reconstruction Loss: 2051.592  Generator Adversarial Loss: 1.681  Discriminator Loss: 0.760
+Epoch [182/200]  Generator Loss: 2144.364  Reconstruction Loss: 2059.601  Generator Adversarial Loss: 1.695  Discriminator Loss: 0.749
+Epoch [183/200]  Generator Loss: 2145.960  Reconstruction Loss: 2061.442  Generator Adversarial Loss: 1.690  Discriminator Loss: 0.752
+Epoch [184/200]  Generator Loss: 2149.070  Reconstruction Loss: 2063.960  Generator Adversarial Loss: 1.702  Discriminator Loss: 0.755
+Epoch [185/200]  Generator Loss: 2154.368  Reconstruction Loss: 2069.387  Generator Adversarial Loss: 1.700  Discriminator Loss: 0.754
+Epoch [186/200]  Generator Loss: 2124.865  Reconstruction Loss: 2039.469  Generator Adversarial Loss: 1.708  Discriminator Loss: 0.756
+Epoch [187/200]  Generator Loss: 2137.127  Reconstruction Loss: 2051.381  Generator Adversarial Loss: 1.715  Discriminator Loss: 0.764
+Epoch [188/200]  Generator Loss: 2148.562  Reconstruction Loss: 2063.170  Generator Adversarial Loss: 1.708  Discriminator Loss: 0.761
+Epoch [189/200]  Generator Loss: 2139.300  Reconstruction Loss: 2054.760  Generator Adversarial Loss: 1.691  Discriminator Loss: 0.756
+Epoch [190/200]  Generator Loss: 2138.029  Reconstruction Loss: 2053.457  Generator Adversarial Loss: 1.691  Discriminator Loss: 0.747
+Epoch [191/200]  Generator Loss: 2137.252  Reconstruction Loss: 2052.550  Generator Adversarial Loss: 1.694  Discriminator Loss: 0.744
+Epoch [192/200]  Generator Loss: 2126.106  Reconstruction Loss: 2039.598  Generator Adversarial Loss: 1.730  Discriminator Loss: 0.753
+Epoch [193/200]  Generator Loss: 2136.098  Reconstruction Loss: 2050.802  Generator Adversarial Loss: 1.706  Discriminator Loss: 0.753
+Epoch [194/200]  Generator Loss: 2150.686  Reconstruction Loss: 2065.407  Generator Adversarial Loss: 1.706  Discriminator Loss: 0.750
+Epoch [195/200]  Generator Loss: 2145.252  Reconstruction Loss: 2059.798  Generator Adversarial Loss: 1.709  Discriminator Loss: 0.749
+Epoch [196/200]  Generator Loss: 2133.724  Reconstruction Loss: 2047.992  Generator Adversarial Loss: 1.715  Discriminator Loss: 0.741
+Epoch [197/200]  Generator Loss: 2141.285  Reconstruction Loss: 2055.635  Generator Adversarial Loss: 1.713  Discriminator Loss: 0.750
+Epoch [198/200]  Generator Loss: 2146.285  Reconstruction Loss: 2060.161  Generator Adversarial Loss: 1.722  Discriminator Loss: 0.750
+Epoch [199/200]  Generator Loss: 2132.378  Reconstruction Loss: 2046.271  Generator Adversarial Loss: 1.722  Discriminator Loss: 0.759
+Epoch [200/200]  Generator Loss: 2138.694  Reconstruction Loss: 2052.648  Generator Adversarial Loss: 1.721  Discriminator Loss: 0.738
+Saved best checkpoint (recon_loss=2039.469) to checkpoints/vae_gan_best_20260810_121929.pt
+Saved final checkpoint to checkpoints/vae_gan_final_epoch200_20260810_121929.pt
+Saved training loss plot to training_plots/vaegan_finetuning_loss_20260810_123314.png
+Saved generated samples plot to visuals/vae_gan_generated_20260810_123314.png
+Saved reconstruction plot to visuals/vae_gan_reconstructed_20260810_123314.png
+
+
+
+
+
+python tstr.py --checkpoint-path checkpoints/vae_gan_best_20260810_121929.pt
+Loaded VAE checkpoint from checkpoints/vae_gan_best_20260810_121929.pt (epoch=186, loss=2039.4694247402988)
+
+Training classifier on real ECGs...
+Classifier epoch 1/80 | train loss: 2.2385 | validation macro F1: 0.1365
+Classifier epoch 2/80 | train loss: 2.0740 | validation macro F1: 0.2363
+Classifier epoch 3/80 | train loss: 1.9740 | validation macro F1: 0.2727
+Classifier epoch 4/80 | train loss: 1.9164 | validation macro F1: 0.2732
+Classifier epoch 5/80 | train loss: 1.8841 | validation macro F1: 0.2194
+Classifier epoch 6/80 | train loss: 1.8493 | validation macro F1: 0.2480
+Classifier epoch 7/80 | train loss: 1.8249 | validation macro F1: 0.2407
+Classifier epoch 8/80 | train loss: 1.8196 | validation macro F1: 0.2870
+Classifier epoch 9/80 | train loss: 1.8033 | validation macro F1: 0.2471
+Classifier epoch 10/80 | train loss: 1.7997 | validation macro F1: 0.2998
+Classifier epoch 11/80 | train loss: 1.7675 | validation macro F1: 0.3012
+Classifier epoch 12/80 | train loss: 1.7549 | validation macro F1: 0.2632
+Classifier epoch 13/80 | train loss: 1.7454 | validation macro F1: 0.3000
+Classifier epoch 14/80 | train loss: 1.7416 | validation macro F1: 0.3052
+Classifier epoch 15/80 | train loss: 1.7318 | validation macro F1: 0.2572
+Classifier epoch 16/80 | train loss: 1.7298 | validation macro F1: 0.2847
+Classifier epoch 17/80 | train loss: 1.7252 | validation macro F1: 0.3021
+Classifier epoch 18/80 | train loss: 1.7143 | validation macro F1: 0.2943
+Classifier epoch 19/80 | train loss: 1.7002 | validation macro F1: 0.2451
+Classifier epoch 20/80 | train loss: 1.7105 | validation macro F1: 0.2972
+Classifier epoch 21/80 | train loss: 1.6866 | validation macro F1: 0.2824
+Classifier epoch 22/80 | train loss: 1.6848 | validation macro F1: 0.2880
+Classifier epoch 23/80 | train loss: 1.6927 | validation macro F1: 0.2855
+Classifier epoch 24/80 | train loss: 1.6863 | validation macro F1: 0.2918
+Classifier epoch 25/80 | train loss: 1.6802 | validation macro F1: 0.2524
+Classifier epoch 26/80 | train loss: 1.6614 | validation macro F1: 0.3056
+Classifier epoch 27/80 | train loss: 1.6624 | validation macro F1: 0.2940
+Classifier epoch 28/80 | train loss: 1.6693 | validation macro F1: 0.2920
+Classifier epoch 29/80 | train loss: 1.6509 | validation macro F1: 0.2491
+Classifier epoch 30/80 | train loss: 1.6474 | validation macro F1: 0.3206
+Classifier epoch 31/80 | train loss: 1.6515 | validation macro F1: 0.2746
+Classifier epoch 32/80 | train loss: 1.6483 | validation macro F1: 0.2998
+Classifier epoch 33/80 | train loss: 1.6343 | validation macro F1: 0.2839
+Classifier epoch 34/80 | train loss: 1.6342 | validation macro F1: 0.2905
+Classifier epoch 35/80 | train loss: 1.6373 | validation macro F1: 0.3071
+Classifier epoch 36/80 | train loss: 1.6339 | validation macro F1: 0.2783
+Classifier epoch 37/80 | train loss: 1.6499 | validation macro F1: 0.2697
+Classifier epoch 38/80 | train loss: 1.6220 | validation macro F1: 0.2346
+Classifier epoch 39/80 | train loss: 1.6218 | validation macro F1: 0.2738
+Classifier epoch 40/80 | train loss: 1.6066 | validation macro F1: 0.2942
+Classifier epoch 41/80 | train loss: 1.6005 | validation macro F1: 0.2921
+Classifier epoch 42/80 | train loss: 1.5974 | validation macro F1: 0.2822
+Early stopping at epoch 42. Best validation macro F1: 0.3206
+
+Training classifier on synthetic ECGs...
+Classifier epoch 1/80 | train loss: 2.2868 | validation macro F1: 0.0870
+Classifier epoch 2/80 | train loss: 2.1678 | validation macro F1: 0.1120
+Classifier epoch 3/80 | train loss: 2.0860 | validation macro F1: 0.1469
+Classifier epoch 4/80 | train loss: 2.0262 | validation macro F1: 0.1455
+Classifier epoch 5/80 | train loss: 1.9691 | validation macro F1: 0.1159
+Classifier epoch 6/80 | train loss: 1.9314 | validation macro F1: 0.1980
+Classifier epoch 7/80 | train loss: 1.8783 | validation macro F1: 0.1522
+Classifier epoch 8/80 | train loss: 1.8428 | validation macro F1: 0.1981
+Classifier epoch 9/80 | train loss: 1.8042 | validation macro F1: 0.1526
+Classifier epoch 10/80 | train loss: 1.7698 | validation macro F1: 0.1454
+Classifier epoch 11/80 | train loss: 1.7562 | validation macro F1: 0.1310
+Classifier epoch 12/80 | train loss: 1.7445 | validation macro F1: 0.1359
+Classifier epoch 13/80 | train loss: 1.7129 | validation macro F1: 0.1376
+Classifier epoch 14/80 | train loss: 1.7037 | validation macro F1: 0.1792
+Classifier epoch 15/80 | train loss: 1.6720 | validation macro F1: 0.1395
+Classifier epoch 16/80 | train loss: 1.6419 | validation macro F1: 0.1598
+Classifier epoch 17/80 | train loss: 1.6114 | validation macro F1: 0.1553
+Classifier epoch 18/80 | train loss: 1.6319 | validation macro F1: 0.1716
+Classifier epoch 19/80 | train loss: 1.6278 | validation macro F1: 0.0961
+Classifier epoch 20/80 | train loss: 1.5850 | validation macro F1: 0.1891
+Early stopping at epoch 20. Best validation macro F1: 0.1981
+
+TSTR results
+TRTR accuracy: 0.4263
+TRTR macro F1: 0.2813
+TSTR accuracy: 0.2602
+TSTR macro F1: 0.1874
+
+Saved results to: /content/Synthetic-ECG-Generator/results/vae_gan_best_20260810_121929

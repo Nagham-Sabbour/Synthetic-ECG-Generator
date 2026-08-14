@@ -1,11 +1,13 @@
-import os
-import torch
-import matplotlib.pyplot as plt
 import datetime
+import os
+
+import matplotlib.pyplot as plt
+import torch
+
 
 def generate_and_plot_samples(vae, mean, std, num_classes=11, samples_per_class=1, output_dir='visuals', filename_prefix='generated_samples', class_names=None, embedding_dim=32, device='cpu'):
     '''
-    Generate synthetic ECG samples for each class and save the plots.
+    Generate one or more normalized ECG samples for every class
 
     Args:
         vae: trained instance of model.VAE
@@ -26,48 +28,47 @@ def generate_and_plot_samples(vae, mean, std, num_classes=11, samples_per_class=
     vae.to(device)
     vae.eval()
 
-    fig, axes = plt.subplots(num_classes, samples_per_class, figsize=(4*samples_per_class, 2*num_classes), squeeze=False)
+    fig, axes = plt.subplots(
+        num_classes,
+        samples_per_class,
+        figsize=(4 * samples_per_class, 2 * num_classes),
+        squeeze=False,
+    )
 
     with torch.no_grad():
-        for class_idx in range(num_classes):
-            label = torch.zeros(samples_per_class, num_classes, device=device)
-            label[:, class_idx] = 1.0
+        for class_id in range(num_classes):
+            labels = torch.zeros(samples_per_class, num_classes, device=device)
+            labels[:, class_id] = 1.0
+            latent = torch.randn(samples_per_class, embedding_dim, device=device)
+            generated = vae.decoder(latent, labels)
+            generated = (generated * std + mean).cpu().numpy()
 
-            z = torch.randn(samples_per_class, embedding_dim, device=device)
-            generated = vae.decoder(z, label)
+            for sample_id in range(samples_per_class):
+                axis = axes[class_id, sample_id]
+                axis.plot(generated[sample_id, 0])
 
-            generated = generated * std + mean
-            generated = generated.cpu().numpy()
+                if sample_id == 0:
+                    class_name = class_names[class_id] if class_names else f"Class {class_id}"
+                    axis.set_ylabel(class_name, fontsize=9)
 
-            for sample_idx in range(samples_per_class):
-                ax = axes[class_idx, sample_idx]
-                ax.plot(generated[sample_idx, 0, :])
-
-                if sample_idx == 0:
-                    label_text = class_names[class_idx] if class_names else f"Class {class_idx}"
-                    ax.set_ylabel(label_text, fontsize=9)
-
-                ax.set_xticks([])
-                ax.set_yticks([])
+                axis.set_xticks([])
+                axis.set_yticks([])
 
     plt.tight_layout()
-
     os.makedirs(output_dir, exist_ok=True)
-    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-    filename = f"{filename_prefix}_{timestamp}.png"
-    save_path = os.path.join(output_dir, filename)
-    fig.savefig(save_path)
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    save_path = os.path.join(output_dir, f"{filename_prefix}_{timestamp}.png")
+    fig.savefig(save_path, dpi=200, bbox_inches="tight")
     plt.close(fig)
 
     print(f"Saved generated samples plot to {save_path}")
-
     return save_path
 
 
 
 def reconstruct_and_plot_samples(vae, signals, labels, mean, std, num_samples=6, output_dir='visuals', filename_prefix='reconstructions', class_names=None, device='cpu'):
     '''
-    Reconstruct real ECG samples through the VAE and save comparison plots (original vs. reconstructed).
+    Plot real ECGs beside their VAE reconstructions
 
     Args:
         vae: trained instance of model.VAE
@@ -90,44 +91,50 @@ def reconstruct_and_plot_samples(vae, signals, labels, mean, std, num_samples=6,
 
     signals = signals.to(device)
     labels = labels.to(device)
-
     num_samples = min(num_samples, signals.size(0))
 
     with torch.no_grad():
-        _, _, recon = vae(signals, labels)
+        _, _, reconstructions = vae(signals, labels)
 
-    real = (signals * std + mean).cpu().numpy()
-    recon = (recon * std + mean).cpu().numpy()
-    labels_cpu = labels.cpu()
+    real_signals = (signals * std + mean).cpu().numpy()
+    reconstructed_signals = (reconstructions * std + mean).cpu().numpy()
+    label_ids = labels.argmax(dim=1).cpu()
 
-    fig, axes = plt.subplots(num_samples, 1, figsize=(8, 2*num_samples), squeeze=False)
+    fig, axes = plt.subplots(
+        num_samples,
+        1,
+        figsize=(8, 2 * num_samples),
+        squeeze=False,
+    )
 
-    for i in range(num_samples):
-        ax = axes[i, 0]
-        ax.plot(real[i, 0, :], label='Original', linewidth=1.5)
-        ax.plot(recon[i, 0, :], label='Reconstructed', linewidth=1.0, linestyle='--')
+    for sample_id in range(num_samples):
+        axis = axes[sample_id, 0]
+        axis.plot(real_signals[sample_id, 0], label="Original", linewidth=1.5)
+        axis.plot(
+            reconstructed_signals[sample_id, 0],
+            label="Reconstructed",
+            linewidth=1.0,
+            linestyle="--",
+        )
 
-        class_idx = torch.argmax(labels_cpu[i]).item()
-        label_text = class_names[class_idx] if class_names else f"Class {class_idx}"
-        ax.set_ylabel(label_text, fontsize=9)
+        class_id = label_ids[sample_id].item()
+        class_name = class_names[class_id] if class_names else f"Class {class_id}"
+        axis.set_ylabel(class_name, fontsize=9)
 
-        if i==0:
-            ax.legend(loc='upper right', fontsize=8)
+        if sample_id == 0:
+            axis.legend(loc="upper right", fontsize=8)
 
-        ax.set_xticks([])
-        ax.set_yticks([])
+        axis.set_xticks([])
+        axis.set_yticks([])
 
     plt.tight_layout()
-
     os.makedirs(output_dir, exist_ok=True)
-    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-    filename = f"{filename_prefix}_{timestamp}.png"
-    save_path = os.path.join(output_dir, filename)
-    fig.savefig(save_path)
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    save_path = os.path.join(output_dir, f"{filename_prefix}_{timestamp}.png")
+    fig.savefig(save_path, dpi=200, bbox_inches="tight")
     plt.close(fig)
 
     print(f"Saved reconstruction plot to {save_path}")
-
     return save_path
 
 
@@ -146,25 +153,28 @@ def plot_training_losses(losses_dict, output_dir='training_plots', filename_pref
     '''
 
     num_losses = len(losses_dict)
-    fig, axes = plt.subplots(num_losses, 1, figsize=(8, 3*num_losses), sharex=True, squeeze=False)
+    fig, axes = plt.subplots(
+        num_losses,
+        1,
+        figsize=(8, 3 * num_losses),
+        sharex=True,
+        squeeze=False,
+    )
 
-    for i, (loss_name, values) in enumerate(losses_dict.items()):
-        ax = axes[i, 0]
-        epochs = range(1, len(values)+1)
-        ax.plot(epochs, values)
-        ax.set_ylabel(loss_name, fontsize=9)
-        ax.grid(True, alpha=0.3)
+    for index, (loss_name, values) in enumerate(losses_dict.items()):
+        axis = axes[index, 0]
+        axis.plot(range(1, len(values) + 1), values)
+        axis.set_ylabel(loss_name, fontsize=9)
+        axis.grid(True, alpha=0.3)
 
-    axes[-1, 0].set_xlabel('Epoch')
+    axes[-1, 0].set_xlabel("Epoch")
     plt.tight_layout()
 
     os.makedirs(output_dir, exist_ok=True)
-    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-    filename = f"{filename_prefix}_{timestamp}.png"
-    save_path = os.path.join(output_dir, filename)
-    fig.savefig(save_path)
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    save_path = os.path.join(output_dir, f"{filename_prefix}_{timestamp}.png")
+    fig.savefig(save_path, dpi=200, bbox_inches="tight")
     plt.close(fig)
 
     print(f"Saved training loss plot to {save_path}")
-    
     return save_path
