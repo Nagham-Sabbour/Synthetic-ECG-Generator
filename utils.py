@@ -98,6 +98,17 @@ def create_balanced_train_loader(data_root, batch_size, seed=42):
 
     return DataLoader(dataset, batch_sampler=batch_sampler)
 
+def create_val_loader(data_root, batch_size):
+    '''
+    Load validation.npz and return a DataLoader for it. 
+    '''
+    val_data = np.load(os.path.join(data_root, "validation.npz"))
+    val_signals = torch.from_numpy(val_data["signals"]).float().unsqueeze(1)
+    val_labels_onehot = torch.from_numpy(val_data["labels_onehot"]).float()
+    val_dataset = TensorDataset(val_signals, val_labels_onehot)
+    
+    return DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+
 
 def load_vae_checkpoint(checkpoint_path, embedding_dim, num_classes, device='cpu'):
     '''
