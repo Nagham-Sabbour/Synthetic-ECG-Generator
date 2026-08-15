@@ -158,8 +158,8 @@ def train_VAE(vae, num_epochs, train_loader, val_loader, optimizer, beta=1.0, de
         )
 
         # save best checkpoint by avg val loss
-        if avg_val_loss < best_loss:
-            best_loss = avg_val_loss
+        if avg_val_loss < best_val_loss:
+            best_val_loss = avg_val_loss
             best_checkpoint_path = os.path.join(checkpoint_dir, f"vae_best_{run_timestamp}.pt")
             torch.save({
                 'model_state_dict': vae.state_dict(),
