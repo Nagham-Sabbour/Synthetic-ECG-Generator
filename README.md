@@ -88,3 +88,13 @@ To run the TSTR (train on synthetic, test on real), run the following command `p
 Default location of the TSTR results is `/test_runs`.
 
 ## Demo Notebook
+A demo notebook (`/demo/demo_notebook.ipynb`) for showing sample input-output was run. It was run in Google Colab with T4 GPU includes the following flow:
+- Environment setup and installations
+- Train the VAE
+- Run evaluation metrics on trained VAE
+- Run TSTR on trained VAE
+- Finetune the VAE using GAN
+- Run evaluation metrics on finetuned model
+- Run TSTR on finetuned model
+
+The outputs generated from these steps got saved to subfolders within `/demo`, such as `/demo/checkpoints`, `/demo/training_plots`, `/demo/visuals` and `/demo/test_runs`. 
